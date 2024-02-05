@@ -1,21 +1,22 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  name: 'my_mac_os'
 
 steps:
 - script: |
-    sudo apt-get update
-    sudo apt-get install -y gcc
-    gcc -Wall -Wextra -pedantic --std=c17 -o dis dis.c
-  displayName: 'update system, compile c file with gcc'
+    docker build -t my-c-app .
+  displayName: 'Build Base Docker img'
 
 - script: |
-    ./dis
-  displayName: 'Run the compiled code'
+    docker run --name my-app-running my-c-app
+  displayName: 'Run the docker container'
+
+- script: |
+    docker rm my-app-running
+  displayName: "Kill running app container"
+
+- script: |
+    docker rmi my-c-app
+  displayName: "Remove the image from docker"
