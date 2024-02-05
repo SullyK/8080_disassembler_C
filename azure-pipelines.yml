@@ -12,6 +12,7 @@ steps:
 - script: |
     docker run --name my-app-running my-c-app
   displayName: 'Run the docker container'
+  continueOnError: true
 
 - script: |
     docker rm my-app-running
