@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 char *readUserInput(void) {
   printf("Enter your filename, (it has to be in this directory)\n");
