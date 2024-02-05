@@ -1,0 +1,21 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: |
+    sudo apt-get update
+    sudo apt-get install -y gcc
+    gcc -Wall -Wextra -pedantic --std=c17 -o dis dis.c
+  displayName: 'update system, compile c file with gcc'
+
+- script: |
+    ./dis
+  displayName: 'Run the compiled code'
