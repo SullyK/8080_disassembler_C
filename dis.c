@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define CHUNK_SIZE 1024// 16KiB = 16 * 1024 (reduced to 1KiB for testing)
 
