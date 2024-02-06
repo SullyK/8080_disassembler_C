@@ -4,7 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define CHUNK_SIZE 1024// 16KiB = 16 * 1024 (reduced to 1KiB for testing)
+#define CHUNK_SIZE 1024 // 16KiB = 16 * 1024 (reduced to 1KiB for testing)
 
 char *readUserInput(void) {
   printf("Enter your filename, (it has to be in this directory)\n");
@@ -26,18 +26,28 @@ char *readUserInput(void) {
 
 void processFileChunks(FILE *fp, char *buffer) {
   size_t bytesread;
-  while ((bytesread = fread(&buffer[0], 1, CHUNK_SIZE, fp)) > 0){
-    printf("%zu\n",bytesread);
+  while ((bytesread = fread(&buffer[0], 1, CHUNK_SIZE, fp)) > 0) {
+    printf("%zu\n", bytesread);
     if (bytesread < (size_t)CHUNK_SIZE) {
       printf("final chunk\n");
       // final chunk, need to figure out a way to deal with this
+      break;
     } else {
       printf("a chunk\n");
-      // not final chunk
+      char extrabyte;
+      int extrabytereturn;
+      extrabytereturn = fread(&extrabyte, 1, 1, fp);
+      if (extrabytereturn == 0) {
+        // final chunk
+        printf("final chunk");
+        break;
+      } else {
+        ungetc((int)extrabyte, fp);
+      }
     }
   }
-  if(ferror(fp)){
-      printf("error reading the file\n");
+  if (ferror(fp)) {
+    printf("error reading the file\n");
   }
 }
 
