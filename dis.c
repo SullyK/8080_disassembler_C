@@ -25,36 +25,24 @@ char *readUserInput(void) {
 }
 
 int disAndWrite(unsigned char *chunk) {
-  // for(int i=0;i<CHUNK_SIZE;i++){
-  //     printf("%02x\n", chunk[i]);
-  // }
+
+  for (int i = 0; i < CHUNK_SIZE; i++) {
+    printf("%02x\n", chunk[i]);
+  }
   // testing purposes to check the output
+
   return 1;
 }
+
 void processFileChunks(FILE *fp, unsigned char *buffer) {
   size_t bytesread;
   while ((bytesread = fread(&buffer[0], 1, CHUNK_SIZE, fp)) > 0) {
-    // printf("%zu\n", bytesread);
-    if (bytesread < (size_t)CHUNK_SIZE) {
-      printf("final chunk\n");
-      // final chunk, need to figure out a way to deal with this
-      break;
-    } else {
-      char extrabyte;
-      int extrabytereturn;
-      extrabytereturn = fread(&extrabyte, 1, 1, fp);
-      if (extrabytereturn == 0) {
-        // final chunk
-        printf("final chunk");
-        break;
-      } else {
-        ungetc((int)extrabyte, fp);
-        disAndWrite(buffer);
-      }
-    }
+    disAndWrite(buffer);
   }
+
   if (ferror(fp)) {
     printf("error reading the file\n");
+    exit(1);
   }
 }
 
