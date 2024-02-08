@@ -24,13 +24,20 @@ char *readUserInput(void) {
   return NULL;
 }
 
-int disAndWrite(unsigned char *chunk) {
+dis(char* store_output,unsigned char *chunk){
 
-  for (int i = 0; i < CHUNK_SIZE; i++) {
-    printf("%02x\n", chunk[i]);
-  }
+    
+}
+
+int disAndWrite(unsigned char *chunk, int size) {
+
+ //for (int i = 0; i < CHUNK_SIZE; i++) {
+    //printf("%02x\n", chunk[i]);
+  //}
   // testing purposes to check the output
-
+    char buffer[256];
+    FILE *fp = fopen("dis.txt", "a");
+    for(int i = 0; i < CHUNK_SIZE)
   return 1;
 }
 
