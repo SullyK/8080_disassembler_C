@@ -125,20 +125,25 @@ int instructionSize(uint8_t opcode) { // unfinished
 int disAndWrite(unsigned char *chunk) { // dont think the size is required since
                                         // we have chunk_size
 
-  for (int i = 0; i < CHUNK_SIZE; i++) {
-    printf("%02x\n", chunk[i]);
-  }
-}
   // testing purposes to check the output
-  //  char lookaheadbuffer[3]; // 3 bytes (don't need null term)
-  //  char buffer[25];         // the buffer shouldn't contain more than 20 char
-  //                   // to write to output (this is the opcode, not the bytes)
-  //  FILE *fp = fopen("dis.txt", "a");
-  //  for (int i = 0; i < CHUNK_SIZE; ++i){
-  //    return 1;
-  //}
+//  for (int i = 0; i < CHUNK_SIZE; i++) {
+//    printf("%02x\n", chunk[i]);
+//  }
+//}
+   FILE *fp = fopen("dis.txt", "a");
+    for (int i = 0; i < CHUNK_SIZE; ++i){
+	//check lookahead buffer only on iterations that aren't the first
+	//check last 2 instructions, if final - 2 required 3 or 2?
+	//can use the size of the buffer with a var to see how many instructions
+	//are required to processed in the next lookahead
+      return 1;
+  }
 
-  void processFileChunks(FILE * fp, unsigned char *buffer) {
+void processFileChunks(FILE * fp, unsigned char *buffer) {
+    char lookaheadbuffer[3]; // 3 bytes (don't need null term)
+    char buffer[25];         // the buffer shouldn't contain more than 20 char
+                     // to write to output (this is the opcode, not the bytes)
+   
     size_t bytesread;
     while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) >
            0) {            // chunk size no. into buffer
