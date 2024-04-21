@@ -128,6 +128,7 @@ int disAndWrite(unsigned char *chunk) { // dont think the size is required since
   for (int i = 0; i < CHUNK_SIZE; i++) {
     printf("%02x\n", chunk[i]);
   }
+}
   // testing purposes to check the output
   //  char lookaheadbuffer[3]; // 3 bytes (don't need null term)
   //  char buffer[25];         // the buffer shouldn't contain more than 20 char
