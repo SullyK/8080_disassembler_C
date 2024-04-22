@@ -122,33 +122,68 @@ int instructionSize(uint8_t opcode) { // unfinished
 //   }
 // }
 
-int disAndWrite(unsigned char *chunk) { // dont think the size is required since
+void deal_with_look_ahead(char* lookahead_buffer, uint8_t size){
+    
+
+}
+
+int disAndWrite(unsigned char *chunk,char* lookahead_buffer, size_t bytesread, uint8_t *lookahead_size) { // dont think the size is required since
                                         // we have chunk_size
 
-  // testing purposes to check the output
-//  for (int i = 0; i < CHUNK_SIZE; i++) {
-//    printf("%02x\n", chunk[i]);
-//  }
+// testing purposes to check the output
+//for (int i = 0; i < bytesread; i++) {
+//    printf("%d\n" i);
+//printf("%02x\n", chunk[i]);
 //}
-   FILE *fp = fopen("dis.txt", "a");
-    for (int i = 0; i < CHUNK_SIZE; ++i){
-	//check lookahead buffer only on iterations that aren't the first
+//}
+
+    //check lookahead buffer only on iterations that aren't the first
 	//check last 2 instructions, if final - 2 required 3 or 2?
 	//can use the size of the buffer with a var to see how many instructions
 	//are required to processed in the next lookahead
-      return 1;
+    
+   FILE *fp = fopen("dis.txt", "a");
+    for (int i = 0; i < bytesread; ++i){
+	if(lookahead_size != 0){
+	    // do_look_ahead_stuff()
+	}
+	//edge-case - 2nd last + instruction size of 3
+	if(i == (bytesread- 2) && instructionSize(chunk[i]) == 3){
+//fill buffer with the current + last instruction, then set lookahead_siz and return
+	    lookahead_buffer[0] = chunk[i];
+	    lookahead_buffer[1] = chunk[i+1];
+	    *lookahead_size = 2;
+	    return;
+	}
+
+	//edgecase - last + instruction size of 2 or 3
+
+	if(i == (bytesread-1)){
+	    uint8_t size = instructionSize(chunk[i])
+	    if(size == 2 || size == 3){
+	    lookahead_buffer[0] = chunk[i];
+	    lookahead_size = size;
+	    }
+	}
+
+	//normal case - TODO: tomorrow
+   
+    }
+     return 1;
   }
 
 void processFileChunks(FILE * fp, unsigned char *buffer) {
-    char lookaheadbuffer[3]; // 3 bytes (don't need null term)
+    char lookahead_buffer[3]; // 3 bytes (don't need null term)
+    uint8_t lookahead_size = 0;
     char buffer[25];         // the buffer shouldn't contain more than 20 char
                      // to write to output (this is the opcode, not the bytes)
    
     size_t bytesread;
-    while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) >
-           0) {            // chunk size no. into buffer
-      disAndWrite(buffer); // process the buffer (this should be the chunk of
-                           // data we read)
+    while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) >0) {            // chunk size no. into buffer
+      disAndWrite(buffer,lookahead_buffer, bytesread, &lookahead_size); // process the buffer (this should be the chunk of
+                           // data we read)                                    
+			   // the bytes read here, will mean if the chunk_size is smaller then its
+			   // fine
     }
 
     if (ferror(fp)) {
