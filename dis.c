@@ -122,94 +122,94 @@ int instructionSize(uint8_t opcode) { // unfinished
 //   }
 // }
 
-void deal_with_look_ahead(char* lookahead_buffer, uint8_t size){
-    
+void deal_with_look_ahead(char *lookahead_buffer, uint8_t size) { 0 }
 
-}
-
-int disAndWrite(unsigned char *chunk,char* lookahead_buffer, size_t bytesread, uint8_t *lookahead_size) { // dont think the size is required since
-                                        // we have chunk_size
+// check lookahead buffer only on iterations that aren't the first
+// check last 2 instructions, if final - 2 required 3 or 2?
+// can use the size of the buffer with a var to see how many instructions
+// are required to processed in the next lookahead
 
 // testing purposes to check the output
-//for (int i = 0; i < bytesread; i++) {
+// for (int i = 0; i < bytesread; i++) {
 //    printf("%d\n" i);
-//printf("%02x\n", chunk[i]);
+// printf("%02x\n", chunk[i]);
 //}
 //}
 
-    //check lookahead buffer only on iterations that aren't the first
-	//check last 2 instructions, if final - 2 required 3 or 2?
-	//can use the size of the buffer with a var to see how many instructions
-	//are required to processed in the next lookahead
-    
-   FILE *fp = fopen("dis.txt", "a");
-    for (int i = 0; i < bytesread; ++i){
-	if(lookahead_size != 0){
-	    // do_look_ahead_stuff()
-	}
-	//edge-case - 2nd last + instruction size of 3
-	if(i == (bytesread- 2) && instructionSize(chunk[i]) == 3){
-//fill buffer with the current + last instruction, then set lookahead_siz and return
-	    lookahead_buffer[0] = chunk[i];
-	    lookahead_buffer[1] = chunk[i+1];
-	    *lookahead_size = 2;
-	    return;
-	}
-
-	//edgecase - last + instruction size of 2 or 3
-
-	if(i == (bytesread-1)){
-	    uint8_t size = instructionSize(chunk[i])
-	    if(size == 2 || size == 3){
-	    lookahead_buffer[0] = chunk[i];
-	    lookahead_size = size;
-	    }
-	}
-
-	//normal case - TODO: tomorrow
-   
+int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer, 
+                uint8_t *lookahead_size) {
+  FILE *fp = fopen("dis.txt", "a");
+  for (int i = 0; i < chunksize; ++i) {
+    if (lookahead_size != 0) {
+      // do_look_ahead_stuff()
     }
-     return 1;
+
+    // lookahead-case - 2nd last + instruction size of 3
+    //[4a][9d][] -- example
+    //requires the last instruction from next buffer
+    if (i == (chunk_size - 2) && instructionSize(chunk[i]) == 3) {
+      // fill buffer with the current + last instruction, then set lookahead_size
+      // and return
+      lookahead_buffer[0] = chunk[i];
+      lookahead_buffer[1] = chunk[i + 1];
+      *lookahead_req_bytes = 2;
+      return;
+    }
+
+    // edgecase - last + instruction size of 2 or 3
+
+    if (i == (chunk_size - 1)) {
+      uint8_t i_size = instructionSize(chunk[i]);
+      if (i_size == 2 || i_size == 3) {
+        lookahead_buffer[0] = chunk[i];
+        *lookahead_req_bytes = i_size - 1;
+      }
+    }
+
+    // normal case - TODO: tomorrow
+  }
+  return 1;
+}
+
+// process the buffer (this should be the chunk of
+// data we read)
+// the bytes read here, will mean if the chunk_size is
+// smaller then its fine 
+void processFileChunks(FILE *fp, unsigned char *buffer) {
+
+  char lookahead_buffer[3];
+  uint8_t lookahead_req_bytes = 0;
+  size_t bytesread;
+
+  //bytes read into buffer, loops for the whole file
+  while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) >0) { 
+    disAndWrite(buffer, bytesread, lookahead_buffer,&lookahead_req_bytes); 
   }
 
-void processFileChunks(FILE * fp, unsigned char *buffer) {
-    char lookahead_buffer[3]; // 3 bytes (don't need null term)
-    uint8_t lookahead_size = 0;
-    char buffer[25];         // the buffer shouldn't contain more than 20 char
-                     // to write to output (this is the opcode, not the bytes)
-   
-    size_t bytesread;
-    while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) >0) {            // chunk size no. into buffer
-      disAndWrite(buffer,lookahead_buffer, bytesread, &lookahead_size); // process the buffer (this should be the chunk of
-                           // data we read)                                    
-			   // the bytes read here, will mean if the chunk_size is smaller then its
-			   // fine
-    }
-
-    if (ferror(fp)) {
-      printf("error reading the file\n");
-      exit(1);
-    }
+  if (ferror(fp)) {
+    printf("error reading the file\n");
+    exit(1);
   }
+}
 
-  int main(void) {
+int main(void) {
 
-    char *filename = readUserInput();
-    if (filename == NULL) {
-      free(filename);
-      return -1;
-    }
-    FILE *fp = fopen(filename, "rb");
-
-    if (fp == NULL) {
-      printf("Could not open file, terminating program\n");
-      free(filename);
-      return -1;
-    }
-
-    unsigned char buffer[CHUNK_SIZE];
-    processFileChunks(fp, buffer);
+  char *filename = readUserInput();
+  if (filename == NULL) {
     free(filename);
-
-    return 0;
+    return -1;
   }
+  FILE *fp = fopen(filename, "rb");
+
+  if (fp == NULL) {
+    printf("Could not open file, terminating program\n");
+    free(filename);
+    return -1;
+  }
+
+  unsigned char buffer[CHUNK_SIZE];
+  processFileChunks(fp, buffer);
+  free(filename);
+
+  return 0;
+}
