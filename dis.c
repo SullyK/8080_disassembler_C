@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #define CHUNK_SIZE 1024 // 16KiB = 16 * 1024 (reduced to 1KiB for testing)
 
@@ -25,11 +26,11 @@ char *readUserInput(void) {
   return NULL;
 }
 
-processOpcode() { // unfinished
-  switch () {
+void process_opcode(char *buffer) { // unfinished
+  switch (buffer[0]) {
   case 0x00:
     printf("NOP");
-    pc += 1;
+    break;
   case 0x01:
     printf("");
   }
@@ -95,32 +96,47 @@ int instructionSize(uint8_t opcode) { // unfinished
 //}
 //}
 
-int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer, uint8_t *lookahead_req_bytes) {
+bool clear_buffer(char* buffer, buffer_size){
+
+}
+
+int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer,
+                uint8_t *lookahead_req_bytes) {
   FILE *fp = fopen("dis.txt", "a");
   char opcode_arr[3];
+  bool ignore_third_byte = false;
 
   for (int i = 0; i < chunk_size; ++i) {
-    if (*lookahead_req_bytes != 0) { // deref to get value
-      // do_look_ahead_stuff()
-      // I want the compiler to optimise this, i'll need to check it myself, to
-      // see it's doing that
-      //
-      //base-case below - the first value could be the instruction
-      if (*lookahead_req_bytes == 1){
-	  opcode_arr[0] = lookahead_buffer[0];
-	  opcode_arr[1] = lookahead_buffer[1];
-	  opcode_arr[2] = chunk[i];
-      continue; //this could be wrong. should go to next for loop interation
-      }
+    if (i == 0 && *lookahead_req_bytes != 0) {
+        // do_look_ahead_stuff()
+        // I want the compiler to optimise this, i'll need to check it myself,
+        // to see it's doing that
+        //
+        // base-case below - the first value could be the instruction
+        if (*lookahead_req_bytes == 1) {
+          opcode_arr[0] = lookahead_buffer[0];
+          if (ignore_third_byte == true) {
+            opcode_arr[1] = chunk[i];
+          } else {
+            opcode_arr[1] = lookahead_buffer[1];
+            opcode_arr[2] = chunk[i];
+          }
+        }
 
-      //TODO: MAJOR ISSUE WHAT IF IT'S ONLY 1 BYTE IN ARRAY (LAST VALUE + ONLY NEEDS 1 MORE?) NEED
-      //TO DEAL WITH THIS CASE
-      else if(*lookahead_req_bytes == 2){
- 	  opcode_arr[0] = lookahead_buffer[0];
-	  opcode_arr[1] = 
-	  opcode_arr[2] = 
-      }
+        // TODO: MAJOR ISSUE WHAT IF IT'S ONLY 1 BYTE IN ARRAY (LAST VALUE +
+        // ONLY NEEDS 1 MORE?) NEED TO DEAL WITH THIS CASE
+        else if (*lookahead_req_bytes == 2) {
+          opcode_arr[0] = lookahead_buffer[0];
+          opcode_arr[1] = chunk[i];
+          // TODO: //need to do a boundary check here in case it's final
+          // iteration but if it's final iteration i can check size of the chunk
+          // is better than 3?
+          opcode_arr[2] = chunk[i + 1];
+        }
 
+        process_opcode(lookahead_buffer, 3);
+	*lookahead_req_bytes = 0;
+        continue;
     }
 
     // lookahead-case - 2nd last + instruction size of 3
@@ -138,10 +154,14 @@ int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer,
       if (i_size == 2 || i_size == 3) {
         lookahead_buffer[0] = chunk[i];
         *lookahead_req_bytes = i_size - 1;
+        if (i_size == 2) {
+          ignore_third_bytes = true;
+        }
       }
     }
 
-    // normal case - TODO: tomorrow
+    // normal case
+    
   }
   return 1;
 }
