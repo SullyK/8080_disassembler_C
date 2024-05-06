@@ -26,7 +26,7 @@ char *readUserInput(void) {
   return NULL;
 }
 
-void process_opcode(char *buffer) { // unfinished
+void process_opcode(unsigned char *buffer) { // unfinished
   switch (buffer[0]) {
   case 0x00:
     printf("NOP");
@@ -96,22 +96,14 @@ int instructionSize(uint8_t opcode) { // unfinished
 //}
 //}
 
-bool clear_buffer(char* buffer, buffer_size){
-
-}
-
 int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer,
                 uint8_t *lookahead_req_bytes) {
   FILE *fp = fopen("dis.txt", "a");
-  char opcode_arr[3];
+  unsigned char opcode_arr[3];
   bool ignore_third_byte = false;
 
   for (int i = 0; i < chunk_size; ++i) {
     if (i == 0 && *lookahead_req_bytes != 0) {
-        // do_look_ahead_stuff()
-        // I want the compiler to optimise this, i'll need to check it myself,
-        // to see it's doing that
-        //
         // base-case below - the first value could be the instruction
         if (*lookahead_req_bytes == 1) {
           opcode_arr[0] = lookahead_buffer[0];
@@ -132,9 +124,10 @@ int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer,
           // iteration but if it's final iteration i can check size of the chunk
           // is better than 3?
           opcode_arr[2] = chunk[i + 1];
+	  i++;
         }
 
-        process_opcode(lookahead_buffer, 3);
+        process_opcode(lookahead_buffer);
 	*lookahead_req_bytes = 0;
         continue;
     }
@@ -142,6 +135,7 @@ int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer,
     // lookahead-case - 2nd last + instruction size of 3
     //[4a][9d][] -- example
     // requires the last instruction from next buffer
+    // this should short-circuit
     if (i == (chunk_size - 2) && instructionSize(chunk[i]) == 3) {
       lookahead_buffer[0] = chunk[i];
       lookahead_buffer[1] = chunk[i + 1];
@@ -161,6 +155,33 @@ int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer,
     }
 
     // normal case
+    // TODO: change the scope of the instruction size, since we check it a couple times
+
+    uint8_t i_size = instructionSize(chunk[i]);
+   
+    //TODO: pretty sure I handle the boundaries for the end of the chunk buffer, so don't need to
+    //handle below, but check
+    if(i_size == 1){
+	process_opcode(chunk[i]);
+	continue;
+    }
+    if(i_size == 2){
+	opcode_arr[0] = chunk[i];
+	opcode_arr[1] = chunk[i+1];
+	i++;
+	process_opcode(opcode_arr);
+	continue;
+    }
+    if(i_size == 3){
+	opcode_arr[0] = chunk[i];
+	opcode_arr[1] = chunk[i+1];
+	opcode_arr[2] = chunk[i+2];
+	i+= 2;
+	process_opcode(opcode_arr);
+	continue;
+    }
+
+    
     
   }
   return 1;
