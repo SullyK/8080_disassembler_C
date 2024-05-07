@@ -32,7 +32,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
     printf("NOP\n");
     break;
   case 0x01:
-    printf("LXI B, %02x,%02x\n", buffer[2], buffer[1]);
+    printf("LXI B, #$%02x%02x\n", buffer[2], buffer[1]); //#$ = how 8080 sees the 16bit number
     break;
   case 0x02:
     printf("STAX B\n");
