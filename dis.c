@@ -29,72 +29,236 @@ char *readUserInput(void) {
 void process_opcode(unsigned char *buffer) { // unfinished
   switch (buffer[0]) {
   case 0x00:
+  case 0x08:
+  case 0x10:
+  case 0x18:
+  case 0x20:
+  case 0x28:
+  case 0x30:
+  case 0x38:
     printf("NOP\n");
     break;
   case 0x01:
-    printf("LXI B, #$%02x%02x\n", buffer[2], buffer[1]); //#$ = how 8080 sees the 16bit number
+    printf("LXI\tB,#$%02x%02x\n", buffer[2],
+           buffer[1]); // #$ = how 8080 sees the 16bit number
+    break;
+  case 0x11:
+    printf("LXI\tD,#$%02x%02x\n", buffer[2], buffer[1]);
+    break;
+  case 0x21:
+    printf("LXI\tH,#$%02x%02x\n", buffer[2], buffer[1]);
+    break;
+  case 0x31:
+    printf("LXI\tSP,#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0x02:
-    printf("STAX B\n");
+    printf("STAX\tB\n");
+    break;
+  case 0x12:
+    printf("STAX\tD\n");
+    break;
+  case 0x22:
+    printf("SHLD\t#$%02x%02x\n", buffer[2], buffer[1]);
+    break;
+  case 0x32:
+    printf("STA\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0x03:
-    printf("INX B\n");
+    printf("INX\tB\n");
+    break;
+  case 0x13:
+    printf("INX\tD\n");
+    break;
+  case 0x23:
+    printf("INX\tH\n");
+    break;
+  case 0x33:
+    printf("INX\tSP\n");
+    break;
   case 0x04:
-    printf("INR B\n");
+    printf("INR\tB\n");
+    break;
+  case 0x14:
+    printf("INR\tD\n");
+    break;
+  case 0x24:
+    printf("INR\tH\n");
+    break;
+  case 0x34:
+    printf("INR\tM\n");
+    break;
+  case 0x05:
+    printf("DCR\tB\n");
+    break;
+  case 0x15:
+    printf("DCR\tD\n");
+    break;
+  case 0x25:
+    printf("DCR\tH\n");
+    break;
+  case 0x35:
+    printf("DCR\tM\n");
+    break;
+  case 0x06:
+    printf("MVI\tB,#$%02x\n", buffer[1]);
+    break;
+  case 0x16:
+    printf("MVI\tD,#$%02x\n", buffer[1]);
+    break;
+  case 0x26:
+    printf("MVI\tH,#$%02x\n", buffer[1]);
+    break;
+  case 0x36:
+    printf("MVI\tM,#$%02x\n", buffer[1]);
+    break;
+  case 0x07:
+    printf("RLC\n");
+    break;
+  case 0x17:
+    printf("RAL\n");
+    break;
+  case 0x27:
+    printf("DAA\n");
+    break;
+  case 0x37:
+    printf("STC\n");
+    break;
+    case 0x09:
+    printf("DAD\tB\n");
+    break;
+  case 0x19:
+    printf("DAD\tD\n");
+    break;
+  case 0x29:
+    printf("DAD\tH\n");
+    break;
+  case 0x39:
+    printf("DAD\tSP\n");
+    break;
+   case 0x0A:
+    printf("LDAX\tB\n");
+    break;
+  case 0x1A:
+    printf("LDAX\tD\n");
+    break;
+    case 0x2A:
+    printf("LHLD\t#$%02x%02x\n",buffer[2],buffer[1]);
+    break;
+  case 0x1A:
+    printf("LDA\t#$%02x%02x\n",buffer[2],buffer[1]);
+    break;
+ case 0x0B:
+    printf("DCX\tB\n"); 
+    break;
+  case 0x1B:
+    printf("DCX\tD\n");
+    break;
+  case 0x2B:
+    printf("DCX\tH\n");    
+    break;
+ case 0x3B:
+    printf("DCX\tSP\n");  
+    break;
+ case 0x0C:
+    printf("INR\tC\n"); 
+    break;
+ case 0x1C:
+    printf("INR\tE\n"); 
+    break;
+  case 0x2C:
+    printf("INR\tL\n");
+    break;
+case 0x3C:
+     printf("INR\tA\n");break;
+case 0x0D:
+     printf("DCR\tC\n");break;
+case 0x1D:
+     printf("DCR\tE\n");break;
+ case 0x2D:
+     printf("DCR\tL\n");break;
+ case 0x3D:
+     printf("DCR\tA\n");break;
+  case 0x0E:
+     printf("MVI\tC,#$%02x\n",buffer[1]);
+     break;
+   case 0x1E:
+     printf("MVI\tE,#$%02x\n",buffer[1]);
+     break;
+    case 0x2E:
+     printf("MVI\tL,#$%02x\n",buffer[1]);
+     break;
+     case 0x3E:
+     printf("MVI\tA,#$%02x\n",buffer[1]);
+     break;
+     case 0x0F:
+     printf("RRC\n");
+     break;
+    case 0x1F:
+     printf("RAR\n");
+     break;
+    case 0x2F:
+     printf("CMA\n");
+     break;
+    case 0x3F:
+     printf("CMC\n");
+     break;
+     //TODO:I am on to 0x04 (ive done all before (from left to right)
+     //TODO: check these above are correct
+     
   }
 }
 
 int instructionSize(uint8_t opcode) { // unfinished
   switch (opcode) {
   case 0x01:
-  case 0x11:
-  case 0x21:
-  case 0x22:
-  case 0x2a:
-  case 0x31:
-  case 0x32:
-  case 0x3a:
-  case 0xc2:
-  case 0xc3:
-  case 0xc4:
-  case 0xca:
-  case 0xcc:
-  case 0xcd:
-  case 0xd2:
-  case 0xd4:
-  case 0xda:
-  case 0xdc:
-  case 0xe2:
-  case 0xe4:
-  case 0xea:
-  case 0xec:
-  case 0xf2:
-  case 0xf4:
-  case 0xfa:
-  case 0xfc:
-    return 3;
-  case 0x06:
-  case 0x0e:
-  case 0x16:
-  case 0x1e:
-  case 0x26:
-  case 0x2e:
-  case 0x36:
-  case 0x3e:
-  case 0xc6:
-  case 0xce:
-  case 0xd3:
-  case 0xd6:
-  case 0xdb:
-  case 0xde:
-  case 0xe6:
-  case 0xee:
-  case 0xf6:
-  case 0xfe:
-    return 2;
-  default:
-    return 1;
-  } // todo: check these are correct
+    case 0x11:
+    case 0x21:
+    case 0x22:
+    case 0x2a:
+    case 0x31:
+    case 0x32:
+    case 0x3a:
+    case 0xc2:
+    case 0xc3:
+    case 0xc4:
+    case 0xca:
+    case 0xcc:
+    case 0xcd:
+    case 0xd2:
+    case 0xd4:
+    case 0xda:
+    case 0xdc:
+    case 0xe2:
+    case 0xe4:
+    case 0xea:
+    case 0xec:
+    case 0xf2:
+    case 0xf4:
+    case 0xfa:
+    case 0xfc:
+      return 3;
+    case 0x06:
+    case 0x0e:
+    case 0x16:
+    case 0x1e:
+    case 0x26:
+    case 0x2e:
+    case 0x36:
+    case 0x3e:
+    case 0xc6:
+    case 0xce:
+    case 0xd3:
+    case 0xd6:
+    case 0xdb:
+    case 0xde:
+    case 0xe6:
+    case 0xee:
+    case 0xf6:
+    case 0xfe:
+      return 2;
+    default:
+      return 1;
+    } // todo: check these are correct
 }
 
 // testing purposes to check the output
@@ -104,12 +268,14 @@ int instructionSize(uint8_t opcode) { // unfinished
 //}
 //}
 
-void disAndWrite(unsigned char *chunk, size_t chunk_size, unsigned char *lookahead_buffer,
-                uint8_t *lookahead_req_bytes, bool *ignore_third_byte) {
-  //FILE *fp = fopen("dis.txt", "a"); //write to this later (for now testing)
+void disAndWrite(unsigned char *chunk, size_t chunk_size,
+                 unsigned char *lookahead_buffer, uint8_t *lookahead_req_bytes,
+                 bool *ignore_third_byte) {
+  // FILE *fp = fopen("dis.txt", "a"); //write to this later (for now testing)
   unsigned char opcode_arr[3];
 
-  for (size_t i = 0; i < chunk_size; ++i) { //TODO: make sure this prefix doesn't mess with anything
+  for (size_t i = 0; i < chunk_size;
+       ++i) { // TODO: make sure this prefix doesn't mess with anything
     if (i == 0 && *lookahead_req_bytes != 0) {
       // base-case below - the first value could be the instruction
       if (*lookahead_req_bytes == 1) {
@@ -172,14 +338,12 @@ void disAndWrite(unsigned char *chunk, size_t chunk_size, unsigned char *lookahe
     // buffer, so don't need to handle below, but check
     if (i_size == 1) {
       process_opcode(&chunk[i]);
-    }
-    else if  (i_size == 2 && i + 1 < chunk_size) {
+    } else if (i_size == 2 && i + 1 < chunk_size) {
       opcode_arr[0] = chunk[i];
       opcode_arr[1] = chunk[i + 1];
       i++;
       process_opcode(opcode_arr);
-    }
-    else if (i_size == 3 && i + 2 < chunk_size) {
+    } else if (i_size == 3 && i + 2 < chunk_size) {
       opcode_arr[0] = chunk[i];
       opcode_arr[1] = chunk[i + 1];
       opcode_arr[2] = chunk[i + 2];
