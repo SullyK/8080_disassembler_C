@@ -104,12 +104,12 @@ int instructionSize(uint8_t opcode) { // unfinished
 //}
 //}
 
-int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer,
+void disAndWrite(unsigned char *chunk, size_t chunk_size, unsigned char *lookahead_buffer,
                 uint8_t *lookahead_req_bytes, bool *ignore_third_byte) {
-  FILE *fp = fopen("dis.txt", "a");
+  //FILE *fp = fopen("dis.txt", "a"); //write to this later (for now testing)
   unsigned char opcode_arr[3];
 
-  for (int i = 0; i < chunk_size; ++i) {
+  for (size_t i = 0; i < chunk_size; ++i) { //TODO: make sure this prefix doesn't mess with anything
     if (i == 0 && *lookahead_req_bytes != 0) {
       // base-case below - the first value could be the instruction
       if (*lookahead_req_bytes == 1) {
@@ -157,7 +157,7 @@ int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer,
         lookahead_buffer[0] = chunk[i];
         *lookahead_req_bytes = i_size - 1;
         if (i_size == 2) {
-          *ignore_third_bytes = true;
+          *ignore_third_byte = true;
         }
       }
     }
@@ -171,26 +171,22 @@ int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer,
     // TODO: pretty sure I handle the boundaries for the end of the chunk
     // buffer, so don't need to handle below, but check
     if (i_size == 1) {
-      process_opcode(chunk[i]);
-      continue;
+      process_opcode(&chunk[i]);
     }
-    if (i_size == 2) {
+    else if  (i_size == 2 && i + 1 < chunk_size) {
       opcode_arr[0] = chunk[i];
       opcode_arr[1] = chunk[i + 1];
       i++;
       process_opcode(opcode_arr);
-      continue;
     }
-    if (i_size == 3) {
+    else if (i_size == 3 && i + 2 < chunk_size) {
       opcode_arr[0] = chunk[i];
       opcode_arr[1] = chunk[i + 1];
       opcode_arr[2] = chunk[i + 2];
       i += 2;
       process_opcode(opcode_arr);
-      continue;
     }
   }
-  return 1;
 }
 
 // process the buffer (this should be the chunk of
@@ -199,14 +195,14 @@ int disAndWrite(unsigned char *chunk, size_t chunk_size, char *lookahead_buffer,
 // smaller then its fine
 void processFileChunks(FILE *fp, unsigned char *buffer) {
 
-  char lookahead_buffer[3];
+  unsigned char lookahead_buffer[3];
   uint8_t lookahead_req_bytes = 0;
   size_t bytesread;
   bool ignore_third_byte = false;
   // bytes read into buffer, loops for the whole file
   while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) > 0) {
     disAndWrite(buffer, bytesread, lookahead_buffer, &lookahead_req_bytes,
-                ignore_third_byte);
+                &ignore_third_byte);
   }
 
   if (ferror(fp)) {
