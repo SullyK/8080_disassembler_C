@@ -123,7 +123,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0x37:
     printf("STC\n");
     break;
-    case 0x09:
+  case 0x09:
     printf("DAD\tB\n");
     break;
   case 0x19:
@@ -135,82 +135,295 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0x39:
     printf("DAD\tSP\n");
     break;
-   case 0x0A:
+  case 0x0A:
     printf("LDAX\tB\n");
     break;
   case 0x1A:
     printf("LDAX\tD\n");
     break;
-    case 0x2A:
-    printf("LHLD\t#$%02x%02x\n",buffer[2],buffer[1]);
+  case 0x2A:
+    printf("LHLD\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0x1A:
-    printf("LDA\t#$%02x%02x\n",buffer[2],buffer[1]);
+    printf("LDA\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
- case 0x0B:
-    printf("DCX\tB\n"); 
+  case 0x0B:
+    printf("DCX\tB\n");
     break;
   case 0x1B:
     printf("DCX\tD\n");
     break;
   case 0x2B:
-    printf("DCX\tH\n");    
+    printf("DCX\tH\n");
     break;
- case 0x3B:
-    printf("DCX\tSP\n");  
+  case 0x3B:
+    printf("DCX\tSP\n");
     break;
- case 0x0C:
-    printf("INR\tC\n"); 
+  case 0x0C:
+    printf("INR\tC\n");
     break;
- case 0x1C:
-    printf("INR\tE\n"); 
+  case 0x1C:
+    printf("INR\tE\n");
     break;
   case 0x2C:
     printf("INR\tL\n");
     break;
-case 0x3C:
-     printf("INR\tA\n");break;
-case 0x0D:
-     printf("DCR\tC\n");break;
-case 0x1D:
-     printf("DCR\tE\n");break;
- case 0x2D:
-     printf("DCR\tL\n");break;
- case 0x3D:
-     printf("DCR\tA\n");break;
+  case 0x3C:
+    printf("INR\tA\n");
+    break;
+  case 0x0D:
+    printf("DCR\tC\n");
+    break;
+  case 0x1D:
+    printf("DCR\tE\n");
+    break;
+  case 0x2D:
+    printf("DCR\tL\n");
+    break;
+  case 0x3D:
+    printf("DCR\tA\n");
+    break;
   case 0x0E:
-     printf("MVI\tC,#$%02x\n",buffer[1]);
-     break;
-   case 0x1E:
-     printf("MVI\tE,#$%02x\n",buffer[1]);
-     break;
-    case 0x2E:
-     printf("MVI\tL,#$%02x\n",buffer[1]);
-     break;
-     case 0x3E:
-     printf("MVI\tA,#$%02x\n",buffer[1]);
-     break;
-     case 0x0F:
-     printf("RRC\n");
-     break;
-    case 0x1F:
-     printf("RAR\n");
-     break;
-    case 0x2F:
-     printf("CMA\n");
-     break;
-    case 0x3F:
-     printf("CMC\n");
-     break;
-     //TODO:I am on to 0x04 (ive done all before (from left to right)
-     //TODO: check these above are correct
-     
-  }
-}
+    printf("MVI\tC,#$%02x\n", buffer[1]);
+    break;
+  case 0x1E:
+    printf("MVI\tE,#$%02x\n", buffer[1]);
+    break;
+  case 0x2E:
+    printf("MVI\tL,#$%02x\n", buffer[1]);
+    break;
+  case 0x3E:
+    printf("MVI\tA,#$%02x\n", buffer[1]);
+    break;
+  case 0x0F:
+    printf("RRC\n");
+    break;
+  case 0x1F:
+    printf("RAR\n");
+    break;
+  case 0x2F:
+    printf("CMA\n");
+    break;
+  case 0x3F:
+    printf("CMC\n");
+    break;
+    // TODO:I am on to 0x04 (ive done all before (from left to right)
+    // TODO: check these above are correct
+    // 0x40 ---> 0x70 (i will do it downwards in a repeated pattern)
+  case 0x40:
+    printf("MOV\tB\tB\n");
+    break;
+  case 0x50:
+    printf("MOV\tD\tB\n");
+    break;
+  case 0x60:
+    printf("MOV\tH\tB\n");
+    break;
+  case 0x70:
+    printf("MOV\tM\tB\n");
+    break;
 
-int instructionSize(uint8_t opcode) { // unfinished
-  switch (opcode) {
-  case 0x01:
+  case 0x41:
+    printf("MOV\tB\tC\n");
+    break;
+  case 0x51:
+    printf("MOV\tD\tC\n");
+    break;
+  case 0x61:
+    printf("MOV\tH\tC\n");
+    break;
+  case 0x71:
+    printf("MOV\tM\tC\n");
+    break;
+
+  case 0x42:
+    printf("MOV\tB\tD\n");
+    break;
+  case 0x52:
+    printf("MOV\tD\tD\n");
+    break;
+  case 0x62:
+    printf("MOV\tH\tD\n");
+    break;
+  case 0x72:
+    printf("MOV\tM\tD\n");
+    break;
+
+  case 0x43:
+    printf("MOV\tB\tE\n");
+    break;
+  case 0x53:
+    printf("MOV\tD\tE\n");
+    break;
+  case 0x63:
+    printf("MOV\tH\tE\n");
+    break;
+  case 0x73:
+    printf("MOV\tM\tE\n");
+    break;
+
+  case 0x44:
+    printf("MOV\tB\tH\n");
+    break;
+  case 0x54:
+    printf("MOV\tD\tH\n");
+    break;
+  case 0x64:
+    printf("MOV\tH\tH\n");
+    break;
+  case 0x74:
+    printf("MOV\tM\tH\n");
+    break;
+
+  case 0x45:
+    printf("MOV\tB\tL\n");
+    break;
+  case 0x55:
+    printf("MOV\tD\tL\n");
+    break;
+  case 0x65:
+    printf("MOV\tH\tL\n");
+    break;
+  case 0x75:
+    printf("MOV\tM\tL\n");
+    break;
+
+  case 0x46:
+    printf("MOV\tB\tM\n");
+    break;
+  case 0x56:
+    printf("MOV\tD\tM\n");
+    break;
+  case 0x66:
+    printf("MOV\tH\tM\n");
+    break;
+  case 0x76:
+    printf("HLT\n");
+    break;
+
+  case 0x47:
+    printf("MOV\tB\tA\n");
+    break;
+  case 0x57:
+    printf("MOV\tD\tA\n");
+    break;
+  case 0x67:
+    printf("MOV\tH\tA\n");
+    break;
+  case 0x77:
+    printf("MOV\tM\tA\n");
+    break;
+
+  case 0x48:
+    printf("MOV\tC\tB\n");
+    break;
+  case 0x58:
+    printf("MOV\tE\tB\n");
+    break;
+  case 0x68:
+    printf("MOV\tL\tB\n");
+    break;
+  case 0x78:
+    printf("MOV\tA\tB\n");
+    break;
+
+  case 0x49:
+    printf("MOV\tC\tC\n");
+    break;
+  case 0x59:
+    printf("MOV\tE\tC\n");
+    break;
+  case 0x69:
+    printf("MOV\tL\tC\n");
+    break;
+  case 0x79:
+    printf("MOV\tA\tC\n");
+    break;
+
+  case 0x4A:
+    printf("MOV\tC\tD\n");
+    break;
+  case 0x5A:
+    printf("MOV\tE\tD\n");
+    break;
+  case 0x6A:
+    printf("MOV\tL\tD\n");
+    break;
+  case 0x7A:
+    printf("MOV\tA\tD\n");
+    break;
+
+  case 0x4B:
+    printf("MOV\tC\tE\n");
+    break;
+  case 0x5B:
+    printf("MOV\tE\tE\n");
+    break;
+  case 0x6B:
+    printf("MOV\tL\tE\n");
+    break;
+  case 0x7B:
+    printf("MOV\tA\tE\n");
+    break;
+
+  case 0x4C:
+    printf("MOV\tC\tH\n");
+    break;
+  case 0x5C:
+    printf("MOV\tE\tH\n");
+    break;
+  case 0x6C:
+    printf("MOV\tL\tH\n");
+    break;
+  case 0x7C:
+    printf("MOV\tA\tH\n");
+    break;
+
+  case 0x4D:
+    printf("MOV\tC\tL\n");
+    break;
+  case 0x5D:
+    printf("MOV\tE\tL\n");
+    break;
+  case 0x6D:
+    printf("MOV\tL\tL\n");
+    break;
+  case 0x7D:
+    printf("MOV\tA\tL\n");
+    break;
+
+  case 0x4E:
+    printf("MOV\tC\tM\n");
+    break;
+  case 0x5E:
+    printf("MOV\tE\tM\n");
+    break;
+  case 0x6E:
+    printf("MOV\tL\tM\n");
+    break;
+  case 0x7E:
+    printf("MOV\tA\tM\n");
+    break;
+
+  case 0x4F:
+    printf("MOV\tC\tA\n");
+    break;
+  case 0x5F:
+    printf("MOV\tE\tA\n");
+    break;
+  case 0x6F:
+    printf("MOV\tL\tA\n");
+    break;
+  case 0x7F:
+    printf("MOV\tA\tA\n");
+    break;
+    
+    //0x80 -> 0xB0 in 4s columns again below
+  }
+
+  int instructionSize(uint8_t opcode) { // unfinished
+    switch (opcode) {
+    case 0x01:
     case 0x11:
     case 0x21:
     case 0x22:
@@ -259,140 +472,140 @@ int instructionSize(uint8_t opcode) { // unfinished
     default:
       return 1;
     } // todo: check these are correct
-}
+  }
 
-// testing purposes to check the output
-// for (int i = 0; i < bytesread; i++) {
-//    printf("%d\n" i);
-// printf("%02x\n", chunk[i]);
-//}
-//}
+  // testing purposes to check the output
+  // for (int i = 0; i < bytesread; i++) {
+  //    printf("%d\n" i);
+  // printf("%02x\n", chunk[i]);
+  //}
+  //}
 
-void disAndWrite(unsigned char *chunk, size_t chunk_size,
-                 unsigned char *lookahead_buffer, uint8_t *lookahead_req_bytes,
-                 bool *ignore_third_byte) {
-  // FILE *fp = fopen("dis.txt", "a"); //write to this later (for now testing)
-  unsigned char opcode_arr[3];
+  void disAndWrite(unsigned char *chunk, size_t chunk_size,
+                   unsigned char *lookahead_buffer,
+                   uint8_t *lookahead_req_bytes, bool *ignore_third_byte) {
+    // FILE *fp = fopen("dis.txt", "a"); //write to this later (for now testing)
+    unsigned char opcode_arr[3];
 
-  for (size_t i = 0; i < chunk_size;
-       ++i) { // TODO: make sure this prefix doesn't mess with anything
-    if (i == 0 && *lookahead_req_bytes != 0) {
-      // base-case below - the first value could be the instruction
-      if (*lookahead_req_bytes == 1) {
-        opcode_arr[0] = lookahead_buffer[0];
-        if (*ignore_third_byte == true) {
+    for (size_t i = 0; i < chunk_size;
+         ++i) { // TODO: make sure this prefix doesn't mess with anything
+      if (i == 0 && *lookahead_req_bytes != 0) {
+        // base-case below - the first value could be the instruction
+        if (*lookahead_req_bytes == 1) {
+          opcode_arr[0] = lookahead_buffer[0];
+          if (*ignore_third_byte == true) {
+            opcode_arr[1] = chunk[i];
+            *ignore_third_byte = false;
+          } else {
+            opcode_arr[1] = lookahead_buffer[1];
+            opcode_arr[2] = chunk[i];
+          }
+        }
+
+        // TODO: MAJOR ISSUE WHAT IF IT'S ONLY 1 BYTE IN ARRAY (LAST VALUE +
+        // ONLY NEEDS 1 MORE?) NEED TO DEAL WITH THIS CASE
+        else if (*lookahead_req_bytes == 2) {
+          opcode_arr[0] = lookahead_buffer[0];
           opcode_arr[1] = chunk[i];
-          *ignore_third_byte = false;
-        } else {
-          opcode_arr[1] = lookahead_buffer[1];
-          opcode_arr[2] = chunk[i];
+          // TODO: //need to do a boundary check here in case it's final
+          // iteration but if it's final iteration i can check size of the chunk
+          // is better than 3?
+          opcode_arr[2] = chunk[i + 1];
+          i++;
         }
+
+        process_opcode(lookahead_buffer);
+        *lookahead_req_bytes = 0;
+        continue;
       }
 
-      // TODO: MAJOR ISSUE WHAT IF IT'S ONLY 1 BYTE IN ARRAY (LAST VALUE +
-      // ONLY NEEDS 1 MORE?) NEED TO DEAL WITH THIS CASE
-      else if (*lookahead_req_bytes == 2) {
-        opcode_arr[0] = lookahead_buffer[0];
-        opcode_arr[1] = chunk[i];
-        // TODO: //need to do a boundary check here in case it's final
-        // iteration but if it's final iteration i can check size of the chunk
-        // is better than 3?
-        opcode_arr[2] = chunk[i + 1];
-        i++;
-      }
-
-      process_opcode(lookahead_buffer);
-      *lookahead_req_bytes = 0;
-      continue;
-    }
-
-    // lookahead-case - 2nd last + instruction size of 3
-    //[4a][9d][] -- example
-    // requires the last instruction from next buffer
-    // this should short-circuit
-    if (i == (chunk_size - 2) && instructionSize(chunk[i]) == 3) {
-      lookahead_buffer[0] = chunk[i];
-      lookahead_buffer[1] = chunk[i + 1];
-      *lookahead_req_bytes = 2;
-      return;
-    }
-
-    if (i == (chunk_size - 1)) {
-      uint8_t i_size = instructionSize(chunk[i]);
-      if (i_size == 2 || i_size == 3) {
+      // lookahead-case - 2nd last + instruction size of 3
+      //[4a][9d][] -- example
+      // requires the last instruction from next buffer
+      // this should short-circuit
+      if (i == (chunk_size - 2) && instructionSize(chunk[i]) == 3) {
         lookahead_buffer[0] = chunk[i];
-        *lookahead_req_bytes = i_size - 1;
-        if (i_size == 2) {
-          *ignore_third_byte = true;
+        lookahead_buffer[1] = chunk[i + 1];
+        *lookahead_req_bytes = 2;
+        return;
+      }
+
+      if (i == (chunk_size - 1)) {
+        uint8_t i_size = instructionSize(chunk[i]);
+        if (i_size == 2 || i_size == 3) {
+          lookahead_buffer[0] = chunk[i];
+          *lookahead_req_bytes = i_size - 1;
+          if (i_size == 2) {
+            *ignore_third_byte = true;
+          }
         }
       }
+
+      // normal case
+      // TODO: change the scope of the instruction size, since we check it a
+      // couple times
+
+      uint8_t i_size = instructionSize(chunk[i]);
+
+      // TODO: pretty sure I handle the boundaries for the end of the chunk
+      // buffer, so don't need to handle below, but check
+      if (i_size == 1) {
+        process_opcode(&chunk[i]);
+      } else if (i_size == 2 && i + 1 < chunk_size) {
+        opcode_arr[0] = chunk[i];
+        opcode_arr[1] = chunk[i + 1];
+        i++;
+        process_opcode(opcode_arr);
+      } else if (i_size == 3 && i + 2 < chunk_size) {
+        opcode_arr[0] = chunk[i];
+        opcode_arr[1] = chunk[i + 1];
+        opcode_arr[2] = chunk[i + 2];
+        i += 2;
+        process_opcode(opcode_arr);
+      }
+    }
+  }
+
+  // process the buffer (this should be the chunk of
+  // data we read)
+  // the bytes read here, will mean if the chunk_size is
+  // smaller then its fine
+  void processFileChunks(FILE * fp, unsigned char *buffer) {
+
+    unsigned char lookahead_buffer[3];
+    uint8_t lookahead_req_bytes = 0;
+    size_t bytesread;
+    bool ignore_third_byte = false;
+    // bytes read into buffer, loops for the whole file
+    while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) > 0) {
+      disAndWrite(buffer, bytesread, lookahead_buffer, &lookahead_req_bytes,
+                  &ignore_third_byte);
     }
 
-    // normal case
-    // TODO: change the scope of the instruction size, since we check it a
-    // couple times
-
-    uint8_t i_size = instructionSize(chunk[i]);
-
-    // TODO: pretty sure I handle the boundaries for the end of the chunk
-    // buffer, so don't need to handle below, but check
-    if (i_size == 1) {
-      process_opcode(&chunk[i]);
-    } else if (i_size == 2 && i + 1 < chunk_size) {
-      opcode_arr[0] = chunk[i];
-      opcode_arr[1] = chunk[i + 1];
-      i++;
-      process_opcode(opcode_arr);
-    } else if (i_size == 3 && i + 2 < chunk_size) {
-      opcode_arr[0] = chunk[i];
-      opcode_arr[1] = chunk[i + 1];
-      opcode_arr[2] = chunk[i + 2];
-      i += 2;
-      process_opcode(opcode_arr);
+    if (ferror(fp)) {
+      printf("error reading the file\n");
+      exit(1);
     }
   }
-}
 
-// process the buffer (this should be the chunk of
-// data we read)
-// the bytes read here, will mean if the chunk_size is
-// smaller then its fine
-void processFileChunks(FILE *fp, unsigned char *buffer) {
+  int main(void) {
 
-  unsigned char lookahead_buffer[3];
-  uint8_t lookahead_req_bytes = 0;
-  size_t bytesread;
-  bool ignore_third_byte = false;
-  // bytes read into buffer, loops for the whole file
-  while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) > 0) {
-    disAndWrite(buffer, bytesread, lookahead_buffer, &lookahead_req_bytes,
-                &ignore_third_byte);
-  }
+    char *filename = readUserInput();
+    if (filename == NULL) {
+      free(filename);
+      return -1;
+    }
+    FILE *fp = fopen(filename, "rb");
 
-  if (ferror(fp)) {
-    printf("error reading the file\n");
-    exit(1);
-  }
-}
+    if (fp == NULL) {
+      printf("Could not open file, terminating program\n");
+      free(filename);
+      return -1;
+    }
 
-int main(void) {
-
-  char *filename = readUserInput();
-  if (filename == NULL) {
+    unsigned char buffer[CHUNK_SIZE];
+    processFileChunks(fp, buffer);
     free(filename);
-    return -1;
+
+    return 0;
   }
-  FILE *fp = fopen(filename, "rb");
-
-  if (fp == NULL) {
-    printf("Could not open file, terminating program\n");
-    free(filename);
-    return -1;
-  }
-
-  unsigned char buffer[CHUNK_SIZE];
-  processFileChunks(fp, buffer);
-  free(filename);
-
-  return 0;
-}
