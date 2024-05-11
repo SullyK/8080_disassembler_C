@@ -417,8 +417,225 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0x7F:
     printf("MOV\tA\tA\n");
     break;
-    
-    //0x80 -> 0xB0 in 4s columns again below
+
+    // 0x80 -> 0xB0 in 4s columns again below
+
+  case 0x80:
+    printf("ADD\tB\n");
+    break;
+  case 0x90:
+    printf("SUB\tB\n");
+    break;
+  case 0xA0:
+    printf("ANA\tB\n");
+    break;
+  case 0xB0:
+    printf("ORA\tB\n");
+    break;
+
+  case 0x81:
+    printf("ADD\tC\n");
+    break;
+  case 0x91:
+    printf("SUB\tC\n");
+    break;
+  case 0xA1:
+    printf("ANA\tC\n");
+    break;
+  case 0xB1:
+    printf("ORA\tC\n");
+    break;
+
+  case 0x82:
+    printf("ADD\tD\n");
+    break;
+  case 0x92:
+    printf("SUB\tD\n");
+    break;
+  case 0xA2:
+    printf("ANA\tD\n");
+    break;
+  case 0xB2:
+    printf("ORA\tD\n");
+    break;
+
+  case 0x83:
+    printf("ADD\tE\n");
+    break;
+  case 0x93:
+    printf("SUB\tE\n");
+    break;
+  case 0xA3:
+    printf("ANA\tE\n");
+    break;
+  case 0xB3:
+    printf("ORA\tE\n");
+    break;
+
+  case 0x84:
+    printf("ADD\tH\n");
+    break;
+  case 0x94:
+    printf("SUB\tH\n");
+    break;
+  case 0xA4:
+    printf("ANA\tH\n");
+    break;
+  case 0xB4:
+    printf("ORA\tH\n");
+    break;
+
+  case 0x85:
+    printf("ADD\tL\n");
+    break;
+  case 0x95:
+    printf("SUB\tL\n");
+    break;
+  case 0xA5:
+    printf("ANA\tL\n");
+    break;
+  case 0xB5:
+    printf("ORA\tL\n");
+    break;
+
+  case 0x86:
+    printf("ADD\tM\n");
+    break;
+  case 0x96:
+    printf("SUB\tM\n");
+    break;
+  case 0xA6:
+    printf("ANA\tM\n");
+    break;
+  case 0xB6:
+    printf("ORA\tM\n");
+    break;
+
+  case 0x87:
+    printf("ADD\tA\n");
+    break;
+  case 0x97:
+    printf("SUB\tA\n");
+    break;
+  case 0xA7:
+    printf("ANA\tA\n");
+    break;
+  case 0xB7:
+    printf("ORA\tA\n");
+    break;
+
+    // next section diff commands
+
+  case 0x88:
+    printf("ADC\tB\n");
+    break;
+  case 0x98:
+    printf("SBB\tB\n");
+    break;
+  case 0xA8:
+    printf("XRA\tB\n");
+    break;
+  case 0xB8:
+    printf("CMP\tB\n");
+    break;
+
+  case 0x89:
+    printf("ADC\tC\n");
+    break;
+  case 0x99:
+    printf("SBB\tC\n");
+    break;
+  case 0xA9:
+    printf("XRA\tC\n");
+    break;
+  case 0xB9:
+    printf("CMP\tC\n");
+    break;
+
+  case 0x8A:
+    printf("ADC\tD\n");
+    break;
+  case 0x9A:
+    printf("SBB\tD\n");
+    break;
+  case 0xAA:
+    printf("XRA\tD\n");
+    break;
+  case 0xBA:
+    printf("CMP\tD\n");
+    break;
+
+  case 0x8B:
+    printf("ADC\tE\n");
+    break;
+  case 0x9B:
+    printf("SBB\tE\n");
+    break;
+  case 0xAB:
+    printf("XRA\tE\n");
+    break;
+  case 0xBB:
+    printf("CMP\tE\n");
+    break;
+
+  
+  case 0x8C:
+    printf("ADC\tH\n");
+    break;
+  case 0x9C:
+    printf("SBB\tH\n");
+    break;
+  case 0xAC:
+    printf("XRA\tH\n");
+    break;
+  case 0xBC:
+    printf("CMP\tH\n");
+    break;
+     
+  case 0x8D:
+    printf("ADC\tL\n");
+    break;
+  case 0x9D:
+    printf("SBB\tL\n");
+    break;
+  case 0xAD:
+    printf("XRA\tL\n");
+    break;
+  case 0xBD:
+    printf("CMP\tL\n");
+    break;
+
+  case 0x8E:
+    printf("ADC\tM\n");
+    break;
+  case 0x9E:
+    printf("SBB\tM\n");
+    break;
+  case 0xAE:
+    printf("XRA\tM\n");
+    break;
+  case 0xBE:
+    printf("CMP\tM\n");
+    break;
+     
+  case 0x8F:
+    printf("ADC\tA\n");
+    break;
+  case 0x9F:
+    printf("SBB\tA\n");
+    break;
+  case 0xAF:
+    printf("XRA\tA\n");
+    break;
+  case 0xBF:
+    printf("CMP\tA\n");
+    break;
+     
+/// last section left:
+/// TODO: check all above
+
+
+
   }
 
   int instructionSize(uint8_t opcode) { // unfinished
