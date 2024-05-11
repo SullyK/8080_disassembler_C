@@ -578,7 +578,6 @@ void process_opcode(unsigned char *buffer) { // unfinished
     printf("CMP\tE\n");
     break;
 
-  
   case 0x8C:
     printf("ADC\tH\n");
     break;
@@ -591,7 +590,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0xBC:
     printf("CMP\tH\n");
     break;
-     
+
   case 0x8D:
     printf("ADC\tL\n");
     break;
@@ -617,7 +616,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0xBE:
     printf("CMP\tM\n");
     break;
-     
+
   case 0x8F:
     printf("ADC\tA\n");
     break;
@@ -630,11 +629,220 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0xBF:
     printf("CMP\tA\n");
     break;
-     
-/// last section left:
-/// TODO: check all above
 
+    /// last section left:
+    /// TODO: check all above
+    /// 0xC0 - > 0xCF
 
+  case 0xC0:
+    printf("RNZ\n");
+    break;
+  case 0xD0:
+    printf("RNC\n");
+    break;
+  case 0xE0:
+    printf("RPO\n");
+    break;
+  case 0xF0:
+    printf("RP\n");
+    break;
+
+  case 0xC1:
+    printf("POP\tB\n");
+    break;
+  case 0xD1:
+    printf("POP\tD\n");
+    break;
+  case 0xE1:
+    printf("POP\tH\n");
+    break;
+  case 0xF1:
+    printf("POP\tPSW\n");
+    break;
+
+  case 0xC2:
+    printf("JNZ\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xD2:
+    printf("JNC\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xE2:
+    printf("JPO\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xF2:
+    printf("JP\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+
+  case 0xC3:
+    printf("JMP\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xD3:
+    printf("OUT\t#$%x02\n", buffer[1]);
+    break;
+  case 0xE3:
+    printf("XTHL\n");
+    break;
+  case 0xF3:
+    printf("DI\n");
+    break;
+
+  case 0xC4:
+    printf("CNZ\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xD4:
+    printf("CNC\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xE4:
+    printf("CPO\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xF4:
+    printf("CP\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+
+  case 0xC5:
+    printf("PUSH\tB\n");
+    break;
+  case 0xD5:
+    printf("PUSH\tD\n");
+    break;
+  case 0xE5:
+    printf("PUSH\tH\n");
+    break;
+  case 0xF5:
+    printf("PUSH\tPSW\n");
+    break;
+
+  case 0xC6:
+    printf("ADI\t#$%x02\n", buffer[1]);
+    break;
+  case 0xD6:
+    printf("SUI\t#$%x02\n", buffer[1]);
+    break;
+  case 0xE6:
+    printf("ANI\t#$%x02\n", buffer[1]);
+    break;
+  case 0xF6:
+    printf("ORI\t#$%x02\n", buffer[1]);
+    break;
+
+  case 0xC7:
+    printf("RST\t0\n");
+    break;
+  case 0xD7:
+    printf("RST\t2\n");
+    break;
+  case 0xE7:
+    printf("RST\t4\n");
+    break;
+  case 0xF7:
+    printf("RST\t6\n");
+    break;
+
+  case 0xC8:
+    printf("RZ\n");
+    break;
+  case 0xD8:
+    printf("RC\n");
+    break;
+  case 0xE8:
+    printf("RPE\n");
+    break;
+  case 0xF8:
+    printf("RM\n");
+    break;
+
+  case 0xC9:
+    printf("RET\n");
+    break;
+  case 0xD9:
+    printf("*RET\n");
+    break;
+  case 0xE9:
+    printf("PCHL\n");
+    break;
+  case 0xF9:
+    printf("SPHL\n");
+    break;
+
+  case 0xCA:
+    printf("JZ\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xDA:
+    printf("JC\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xEA:
+    printf("JPE\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xFA:
+    printf("JM\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+
+  case 0xCB:
+    printf("*JMP\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xDB:
+    printf("IN\t#$%x02\n", buffer[1]);
+    break;
+  case 0xEA:
+    printf("XCHG\n");
+    break;
+  case 0xFA:
+    printf("EI\n");
+    break;
+
+  case 0xCC:
+    printf("CZ\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xDC:
+    printf("CC\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xEC:
+    printf("CPE\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xFC:
+    printf("CM\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+
+  case 0xCD:
+    printf("CALL\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xDD:
+    printf("*CALL\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xED:
+    printf("*CALL\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+  case 0xFD:
+    printf("*CALL\t#$%x02%x02\n", buffer[2], buffer[1]);
+    break;
+
+  case 0xCE:
+    printf("ACI\t#$%x02\n", buffer[1]);
+    break;
+  case 0xDE:
+    printf("SBI\t#$%x02\n", buffer[1]);
+    break;
+  case 0xEE:
+    printf("XRI\t#$%x02\n", buffer[1]);
+    break;
+  case 0xFE:
+    printf("CPI\t#$%x02\n", buffer[1]);
+    break;
+
+  case 0xCF:
+    printf("RST\t1\n");
+    break;
+  case 0xDF:
+    printf("RST\t3\n");
+    break;
+  case 0xEF:
+    printf("RST\t5\n");
+    break;
+  case 0xFF:
+    printf("RST\t7\n");
+    break;
+
+    //TODO: check this crap
 
   }
 
