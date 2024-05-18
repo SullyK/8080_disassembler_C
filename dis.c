@@ -39,8 +39,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
     printf("NOP\n");
     break;
   case 0x01:
-    printf("LXI\tB,#$%02x%02x\n", buffer[2],
-           buffer[1]); // #$ = how 8080 sees the 16bit number
+    printf("LXI\tB,#$%02x%02x\n", buffer[2],buffer[1]); // #$ = how 8080 sees the 16bit number
     break;
   case 0x11:
     printf("LXI\tD,#$%02x%02x\n", buffer[2], buffer[1]);
@@ -144,7 +143,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0x2A:
     printf("LHLD\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
-  case 0x1A:
+  case 0x3A:
     printf("LDA\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0x0B:
@@ -650,20 +649,20 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
 
   case 0xC2:
-    printf("JNZ\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JNZ\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xD2:
-    printf("JNC\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JNC\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xE2:
-    printf("JPO\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JPO\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xF2:
-    printf("JP\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JP\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
 
   case 0xC3:
-    printf("JMP\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JMP\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xD3:
     printf("OUT\t#$%x02\n", buffer[1]);
@@ -676,16 +675,16 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
 
   case 0xC4:
-    printf("CNZ\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("CNZ\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xD4:
-    printf("CNC\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("CNC\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xE4:
-    printf("CPO\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("CPO\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xF4:
-    printf("CP\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("CP\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
 
   case 0xC5:
@@ -752,49 +751,49 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
 
   case 0xCA:
-    printf("JZ\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JZ\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xDA:
-    printf("JC\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JC\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xEA:
-    printf("JPE\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JPE\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xFA:
-    printf("JM\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JM\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
 
   case 0xCB:
-    printf("JMP\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JMP\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xDB:
     printf("IN\t#$%x02\n", buffer[1]);
     break;
-  case 0xEA:
+  case 0xEB:
     printf("XCHG\n");
     break;
-  case 0xFA:
+  case 0xFB:
     printf("EI\n");
     break;
 
   case 0xCC:
-    printf("CZ\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("CZ\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xDC:
-    printf("CC\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("CC\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xEC:
-    printf("CPE\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("CPE\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xFC:
-    printf("CM\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("CM\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
 
   case 0xCD:
   case 0xDD:
   case 0xED:
   case 0xFD:
-    printf("CALL\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("CALL\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
 
   case 0xCE:
@@ -822,8 +821,9 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0xFF:
     printf("RST\t7\n");
     break;
-
   }
+  return;
+}
 
   int instructionSize(uint8_t opcode) { // unfinished
     switch (opcode) {
