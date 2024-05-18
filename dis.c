@@ -207,9 +207,6 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0x3F:
     printf("CMC\n");
     break;
-    // TODO:I am on to 0x04 (ive done all before (from left to right)
-    // TODO: check these above are correct
-    // 0x40 ---> 0x70 (i will do it downwards in a repeated pattern)
   case 0x40:
     printf("MOV\tB\tB\n");
     break;
@@ -418,8 +415,6 @@ void process_opcode(unsigned char *buffer) { // unfinished
     printf("MOV\tA\tA\n");
     break;
 
-    // 0x80 -> 0xB0 in 4s columns again below
-
   case 0x80:
     printf("ADD\tB\n");
     break;
@@ -524,8 +519,6 @@ void process_opcode(unsigned char *buffer) { // unfinished
     printf("ORA\tA\n");
     break;
 
-    // next section diff commands
-
   case 0x88:
     printf("ADC\tB\n");
     break;
@@ -629,10 +622,6 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0xBF:
     printf("CMP\tA\n");
     break;
-
-    /// last section left:
-    /// TODO: check all above
-    /// 0xC0 - > 0xCF
 
   case 0xC0:
     printf("RNZ\n");
@@ -752,10 +741,8 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
 
   case 0xC9:
-    printf("RET\n");
-    break;
   case 0xD9:
-    printf("*RET\n");
+    printf("RET\n");
     break;
   case 0xE9:
     printf("PCHL\n");
@@ -778,7 +765,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
 
   case 0xCB:
-    printf("*JMP\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("JMP\t#$%x02%x02\n", buffer[2], buffer[1]);
     break;
   case 0xDB:
     printf("IN\t#$%x02\n", buffer[1]);
@@ -804,16 +791,10 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
 
   case 0xCD:
-    printf("CALL\t#$%x02%x02\n", buffer[2], buffer[1]);
-    break;
   case 0xDD:
-    printf("*CALL\t#$%x02%x02\n", buffer[2], buffer[1]);
-    break;
   case 0xED:
-    printf("*CALL\t#$%x02%x02\n", buffer[2], buffer[1]);
-    break;
   case 0xFD:
-    printf("*CALL\t#$%x02%x02\n", buffer[2], buffer[1]);
+    printf("CALL\t#$%x02%x02\n", buffer[2], buffer[1]);
     break;
 
   case 0xCE:
@@ -841,8 +822,6 @@ void process_opcode(unsigned char *buffer) { // unfinished
   case 0xFF:
     printf("RST\t7\n");
     break;
-
-    //TODO: check this crap
 
   }
 
