@@ -10,19 +10,19 @@
 
 char *readUserInput(void) {
   printf("Enter your filename, (it has to be in this directory)\n");
-  char *line = NULL;
+  char *line_buffer = NULL;
   size_t linecap = 0;
   ssize_t linelength;
-  linelength = getline(&line, &linecap, stdin);
+  linelength = getline(&line_buffer, &linecap, stdin);
   if (linelength == -1) {
     printf("Failed to read line");
-    free(line);
+    free(line_buffer);
     return NULL;
-  } else if (linelength > 0 && line[linelength - 1] == '\n') {
-    line[linelength - 1] = '\0';
-    return &line[0];
+  } else if (linelength > 0 && line_buffer[linelength - 1] == '\n') {
+    line_buffer[linelength - 1] = '\0';
+    return line_buffer;
   }
-  free(line);
+  free(line_buffer);
   return NULL;
 }
 
