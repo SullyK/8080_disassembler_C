@@ -1,14 +1,7 @@
-#define _GNU_SOURCE 1
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include "dis.h"
 
-#define CHUNK_SIZE 1024 // 16KiB = 16 * 1024 (reduced to 1KiB for testing)
 
-char *readUserInput(void) {
+char *read_user_input(void) {
   printf("Enter your filename, (it has to be in this directory)\n");
   char *line_buffer = NULL;
   size_t linecap = 0;
@@ -888,11 +881,10 @@ void process_opcode(unsigned char *buffer) { // unfinished
   void disAndWrite(unsigned char *chunk, size_t chunk_size,
                    unsigned char *lookahead_buffer,
                    uint8_t *lookahead_req_bytes, bool *ignore_third_byte) {
-    // FILE *fp = fopen("dis.txt", "a"); //write to this later (for now testing)
     unsigned char opcode_arr[3];
 
     for (size_t i = 0; i < chunk_size;
-         ++i) { // TODO: make sure this prefix doesn't mess with anything
+         ++i) {
       if (i == 0 && *lookahead_req_bytes != 0) {
         // base-case below - the first value could be the instruction
         if (*lookahead_req_bytes == 1) {
@@ -994,7 +986,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
 
   int main(void) {
 
-    char *filename = readUserInput();
+    char *filename = read_user_input();
     if (filename == NULL) {
       free(filename);
       return -1;
