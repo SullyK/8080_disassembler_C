@@ -657,7 +657,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
     printf("JMP\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xD3:
-    printf("OUT\t#$%x02\n", buffer[1]);
+    printf("OUT	#$%02x\n", buffer[1]);
     break;
   case 0xE3:
     printf("XTHL\n");
@@ -693,16 +693,16 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
 
   case 0xC6:
-    printf("ADI\t#$%x02\n", buffer[1]);
+    printf("ADI	#$%02x\n", buffer[1]);
     break;
   case 0xD6:
-    printf("SUI\t#$%x02\n", buffer[1]);
+    printf("SUI	#$%02x\n", buffer[1]);
     break;
   case 0xE6:
-    printf("ANI\t#$%x02\n", buffer[1]);
+    printf("ANI	#$%02x\n", buffer[1]);
     break;
   case 0xF6:
-    printf("ORI\t#$%x02\n", buffer[1]);
+    printf("ORI	#$%02x\n", buffer[1]);
     break;
 
   case 0xC7:
@@ -759,7 +759,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
     printf("JMP\t#$%02x%02x\n", buffer[2], buffer[1]);
     break;
   case 0xDB:
-    printf("IN\t#$%x02\n", buffer[1]);
+    printf("IN	#$%02x\n", buffer[1]);
     break;
   case 0xEB:
     printf("XCHG\n");
@@ -789,16 +789,16 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
 
   case 0xCE:
-    printf("ACI\t#$%x02\n", buffer[1]);
+    printf("ACI	#$%02x\n", buffer[1]);
     break;
   case 0xDE:
-    printf("SBI\t#$%x02\n", buffer[1]);
+    printf("SBI	#$%02x\n", buffer[1]);
     break;
   case 0xEE:
-    printf("XRI\t#$%x02\n", buffer[1]);
+    printf("XRI	#$%02x\n", buffer[1]);
     break;
   case 0xFE:
-    printf("CPI\t#$%x02\n", buffer[1]);
+    printf("CPI	#$%02x\n", buffer[1]);
     break;
 
   case 0xCF:
@@ -983,7 +983,17 @@ void disAndWrite(unsigned char *chunk, size_t chunk_size,
     }
 
     if (i == (chunk_size - 1) && instructionSize(chunk[i] == 2)) {
+      lookahead_buffer[0] = chunk[i];
+      *lookahead_bytes_needed = 1;
     }
+
+    if (i == (chunk_size - 1) && instructionSize(chunk[i] == 3)) {
+      lookahead_buffer[0] = chunk[i];
+      *lookahead_bytes_needed = 2;
+    }
+    // the above should cover the 3 lookahead cases
+    // 2nd last requiring 3 bytes
+    // last requiring 2 bytes or 3 bytes
 
     // TODO: Come back to this later, im gonna simply it first
     //     if (i == (chunk_size - 1)) {
@@ -1008,10 +1018,16 @@ void disAndWrite(unsigned char *chunk, size_t chunk_size,
     if (i_size == 1) {
       process_opcode(&chunk[i]);
     } else if (i_size == 2 && i + 1 < chunk_size) {
-      opcode_arr[0] = chunk[i];
-      opcode_arr[1] = chunk[i + 1];
-      i++;
-      process_opcode(opcode_arr);
+      if (!out_of_bounds(i+1, chunk_size)) { //redudant
+        opcode_arr[0] = chunk[i];
+        opcode_arr[1] = chunk[i + 1];
+        i++;
+        process_opcode(opcode_arr);
+      } else {
+        printf("you are out of bounds stupid\n");
+        printf("program terminating\n");
+        exit(-1);
+      }
     } else if (i_size == 3 && i + 2 < chunk_size) {
       opcode_arr[0] = chunk[i];
       opcode_arr[1] = chunk[i + 1];
