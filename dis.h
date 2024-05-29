@@ -13,7 +13,7 @@
 
 char *read_user_input(void);
 void process_opcode(unsigned char *buffer);
-int instructionSize(uint8_t opcode);
+uint8_t instructionSize(uint8_t opcode);
 void disAndWrite(unsigned char *chunk, size_t chunk_size,
                  unsigned char *lookahead_buffer, uint8_t *lookahead_req_bytes,
                  bool *ignore_third_byte);
