@@ -927,8 +927,8 @@ void process_lookahead_buffer(unsigned char *chunk, size_t chunk_size,
   // TODO: I am certain that it's safe to just send in the buffer with extra
   // (buffer[2]) being filled as the process_opcode will just ignore it if the
   // instruction only uses 2 chars
-  printf("look_byytes_needed: %d\n", *lookahead_bytes_needed);
-  printf("lookahead_size: %d\n", *lookahead_size);
+//  printf("look_byytes_needed: %d\n", *lookahead_bytes_needed);
+//  printf("lookahead_size: %d\n", *lookahead_size);
   if (*lookahead_bytes_needed == 1 && *lookahead_size == 2) {
     opcode_arr[0] = lookahead_buffer[0];
     opcode_arr[1] = lookahead_buffer[1];
@@ -994,7 +994,7 @@ void disAndWrite(unsigned char *chunk, size_t chunk_size,
       //printf("THIS SHOULD NOT PRINT");
       process_lookahead_buffer(chunk, chunk_size, lookahead_buffer,
                                lookahead_bytes_needed, &i, lookahead_size);
-       printf("lookahead processed\n");
+//       printf("lookahead processed\n");
       continue;
     }
 
@@ -1005,8 +1005,8 @@ void disAndWrite(unsigned char *chunk, size_t chunk_size,
     if (i == (chunk_size - 2) && instructionSize(chunk[i]) == 3) {
       // bounds check first:
       //
-      printf("chunk-size - 2");
-      printf("ACTIVATING buffer on iteration: %d, number of instruction is 3!\n", i);
+//      printf("chunk-size - 2");
+//      printf("ACTIVATING buffer on iteration: %d, number of instruction is 3!\n", i);
       if (!out_of_bounds(i + 1, chunk_size)) {
         lookahead_buffer[0] = chunk[i];
         lookahead_buffer[1] = chunk[i + 1];
@@ -1022,7 +1022,7 @@ void disAndWrite(unsigned char *chunk, size_t chunk_size,
     }
 
     if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 2) {
-      printf("ACTIVATING buffer on iteration: %d, number of instruction is 2!lol\n", i); printf("CHUNK[I] = %02x\n", chunk[i]);
+//      printf("ACTIVATING buffer on iteration: %d, number of instruction is 2!lol\n", i); printf("CHUNK[I] = %02x\n", chunk[i]);
       lookahead_buffer[0] = chunk[i];
       *lookahead_bytes_needed = 1;
       *lookahead_size = 1;
@@ -1034,8 +1034,8 @@ void disAndWrite(unsigned char *chunk, size_t chunk_size,
     // not sure since it might filled and burn another iteration which would
     // lead to issues
     if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 3) {
-      printf("chunk_size - 1 and instruction size 3");
-      printf("ACTIVATING buffer on iteration: %d, number of instructionis 3!\n", i);
+//      printf("chunk_size - 1 and instruction size 3");
+//      printf("ACTIVATING buffer on iteration: %d, number of instructionis 3!\n", i);
       lookahead_buffer[0] = chunk[i];
       *lookahead_bytes_needed = 2;
       *lookahead_size = 1;
