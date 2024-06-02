@@ -21,9 +21,9 @@ void process_opcode(unsigned char *buffer) { // unfinished
   // below for debugging:
   //
   for (size_t x = 0; x < 3; x++) {
-    printf("%02x", buffer[x]);
+    // printf("%02x", buffer[x]);
   }
-  printf("\n");
+  // printf("\n");
   switch (buffer[0]) {
   case 0x00:
   case 0x08:
@@ -699,6 +699,11 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
 
   case 0xC6:
+    // printf("FIND ME\n");
+    // for (size_t x = 0; x < 3; x++) {
+    //  printf("%02x", buffer[x]);
+    //}
+    // printf("\n");
     printf("ADI	#$%02x\n", buffer[1]);
     break;
   case 0xD6:
@@ -825,7 +830,7 @@ void process_opcode(unsigned char *buffer) { // unfinished
 
 uint8_t instructionSize(uint8_t opcode) { // unfinished
 
-  printf("instru size = %02x\n", opcode);
+  // printf("instru size = %02x\n", opcode);
   switch (opcode) {
   case 0x01:
   case 0x11:
@@ -914,49 +919,48 @@ bool lookahead_empty(uint8_t *lookahead_bytes_needed) {
 // TODO: deal with final iterations bound checking etc
 void process_lookahead_buffer(unsigned char *chunk, size_t chunk_size,
                               unsigned char *lookahead_buffer,
-                              uint8_t *lookahead_bytes_needed,
-                              bool *ignore_third_byte, size_t *i) {
+                              uint8_t *lookahead_bytes_needed, size_t *i,
+                              unsigned int *lookahead_size) {
 
-  printf("lookahead_bytes_needed : %d\n", *lookahead_bytes_needed);
+  // printf("lookahead_bytes_needed : %d\n", *lookahead_bytes_needed);
   unsigned char opcode_arr[3];
   // TODO: I am certain that it's safe to just send in the buffer with extra
   // (buffer[2]) being filled as the process_opcode will just ignore it if the
   // instruction only uses 2 chars
-  if (*lookahead_bytes_needed == 1) {
+  printf("look_byytes_needed: %d\n", *lookahead_bytes_needed);
+  printf("lookahead_size: %d\n", *lookahead_size);
+  if (*lookahead_bytes_needed == 1 && *lookahead_size == 2) {
     opcode_arr[0] = lookahead_buffer[0];
     opcode_arr[1] = lookahead_buffer[1];
-    if (*ignore_third_byte == true && !out_of_bounds(*i, chunk_size) == true) {
-      opcode_arr[2] = chunk[*i];
-      *ignore_third_byte = false;
+    opcode_arr[2] = chunk[*i];
+    if (!out_of_bounds(*i, chunk_size) == true) {
+      // opcode_arr[2] = chunk[*i];// this makes no sense it's probably worng
       *lookahead_bytes_needed = 0;
     }
   }
 
   // TODO: MAJOR ISSUE WHAT IF IT'S ONLY 1 BYTE IN ARRAY (LAST VALUE +
   // ONLY NEEDS 1 MORE?) NEED TO DEAL WITH THIS CASE
-  else if (*lookahead_bytes_needed == 2) {
-    if (*ignore_third_byte == true && !out_of_bounds(*i, chunk_size)) {
-      opcode_arr[0] = lookahead_buffer[0];
-      opcode_arr[1] = chunk[*i];
-      *ignore_third_byte = false;
-      *lookahead_bytes_needed = 0;
-
-    } else if (*ignore_third_byte == false &&
-               !out_of_bounds((*i) + 1, chunk_size)) {
-      opcode_arr[0] = lookahead_buffer[0];
-      opcode_arr[1] = chunk[*i];
-      opcode_arr[2] = chunk[*i + 1];
-      (*i)++;
-      *ignore_third_byte = false;
-      *lookahead_bytes_needed = 0;
-      // TODO: I had this above i++ to increment i because we burned through
-      // iteration passed in and the next one, however this could potentially go
-      // out of bounds?I think the logic might be flawed
-    }
-    // TODO: //need to do a boundary check here in case it's final
-    // iteration but if it's final iteration i can check size of the chunk
-    // is better than 3?
+  if (*lookahead_bytes_needed == 1 && *lookahead_size == 1) {
+    opcode_arr[0] = lookahead_buffer[0];
+    opcode_arr[1] = chunk[*i];
+    *lookahead_bytes_needed = 0;
+    // TODO: I had this above i++ to increment i because we burned through
+    // iteration passed in and the next one, however this could potentially go
+    // out of bounds?I think the logic might be flawed
   }
+
+  if (*lookahead_bytes_needed == 2 && *lookahead_size == 1) {
+    opcode_arr[0] = lookahead_buffer[0];
+    opcode_arr[1] = chunk[*i];
+    opcode_arr[2] = chunk[(*i) + 1];
+    (*i)++;
+    *lookahead_bytes_needed = 0;
+  }
+
+  // TODO: //need to do a boundary check here in case it's final
+  // iteration but if it's final iteration i can check size of the chunk
+  // is better than 3?
   *lookahead_bytes_needed = 0;
   process_opcode(opcode_arr); // TODO: this was lookahead_buffer but I think
                               // that's a bug? should be opcode_arr?
@@ -970,20 +974,27 @@ void process_lookahead_buffer(unsigned char *chunk, size_t chunk_size,
 // TODO: Make proper tests for each chunk
 void disAndWrite(unsigned char *chunk, size_t chunk_size,
                  unsigned char *lookahead_buffer,
-                 uint8_t *lookahead_bytes_needed, bool *ignore_third_byte) {
+                 uint8_t *lookahead_bytes_needed,unsigned int *lookahead_size) {
 
   unsigned char opcode_arr[3];
 
   for (size_t i = 0; i < chunk_size; i++) {
-    printf("iteration: %d\n", i);
-    printf("byte: %02x\n", chunk[i]);
+    size_t iteration_value = i;
+    unsigned char chunk_value = chunk[i];
+//    printf("iteration: %d\n", i);
+ //   printf("byte: %02x\n", chunk[i]);
+ //   printf("lookahead bytes needed: %d\n", *lookahead_bytes_needed);
+    if(chunk[i] == 0x00 && i == 1023){
+	int fsdfdsfdsfd = 50;
+    }
 
     // first iteration: deal with previous lookahead_buffer as long the flag
     // needed is not empty otherwise never runs
-    if (i == 0 && !lookahead_empty(lookahead_bytes_needed)) {
+    if (i == 0 && (*lookahead_bytes_needed) > 0){
+      //printf("THIS SHOULD NOT PRINT");
       process_lookahead_buffer(chunk, chunk_size, lookahead_buffer,
-                               lookahead_bytes_needed, ignore_third_byte, &i);
-      printf("lookahead processed\n");
+                               lookahead_bytes_needed, &i, lookahead_size);
+       printf("lookahead processed\n");
       continue;
     }
 
@@ -994,64 +1005,86 @@ void disAndWrite(unsigned char *chunk, size_t chunk_size,
     if (i == (chunk_size - 2) && instructionSize(chunk[i]) == 3) {
       // bounds check first:
       //
-      printf("This should trigger!\n");
+      printf("chunk-size - 2");
+      printf("ACTIVATING buffer on iteration: %d, number of instruction is 3!\n", i);
       if (!out_of_bounds(i + 1, chunk_size)) {
         lookahead_buffer[0] = chunk[i];
         lookahead_buffer[1] = chunk[i + 1];
         *lookahead_bytes_needed = 1;
-        *ignore_third_byte = true;
+        *lookahead_size = 2;
+        break;
       } else {
-        printf("you are out of bounds stupid\n");
-        printf("program terminating\n");
+        // printf("you are out of bounds stupid\n");
+        // printf("program terminating\n");
         exit(-1);
       }
       return;
     }
 
-    if (i == (chunk_size - 1) && instructionSize(chunk[i] == 2)) {
+    if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 2) {
+      printf("ACTIVATING buffer on iteration: %d, number of instruction is 2!lol\n", i); printf("CHUNK[I] = %02x\n", chunk[i]);
       lookahead_buffer[0] = chunk[i];
       *lookahead_bytes_needed = 1;
-      *ignore_third_byte = true;
-      return;
+      *lookahead_size = 1;
+      break;
     }
 
-    if (i == (chunk_size - 1) && instructionSize(chunk[i] == 3)) {
+    // TODO: I think the whole ignore third byte is redudtant as the processing
+    // done by processopcode ignored the 3rd byte if its not required? but im
+    // not sure since it might filled and burn another iteration which would
+    // lead to issues
+    if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 3) {
       printf("chunk_size - 1 and instruction size 3");
+      printf("ACTIVATING buffer on iteration: %d, number of instructionis 3!\n", i);
       lookahead_buffer[0] = chunk[i];
       *lookahead_bytes_needed = 2;
-      *ignore_third_byte = false;
-      return;
+      *lookahead_size = 1;
+      break;
     }
     // the above should cover the 3 lookahead cases
     // 2nd last requiring 3 bytes
     // last requiring 2 bytes or 3 bytes
 
     uint8_t i_size = instructionSize(chunk[i]);
+ //   printf("Instruction size: %d\n", i_size);
 
+    // printf("i = %d\n", i);
     // TODO: pretty sure I handle the boundaries for the end of the chunk
     // buffer, so don't need to handle below, but check
     if (i_size == 1) {
+//	printf("process_opcode for size 1\n");
       process_opcode(&chunk[i]);
-    } else if (i_size == 2 && i + 1 < chunk_size) {
+      continue;
+    } else if (i_size == 2) {
+      //  printf("process_opcode for size 2\n");
       if (!out_of_bounds(i + 1, chunk_size)) { // redudant
+        // printf("THIS SHOULD PRINT FOR I_SIZE == 2");
         opcode_arr[0] = chunk[i];
+        // printf("opcode_arr[0]: %02x", opcode_arr[0]);
         opcode_arr[1] = chunk[i + 1];
+
+        // printf("opcode_arr[1]: %02x", opcode_arr[1]);
         i++;
         // suspect this might out of bounds and mess up next chunk so debugging
-        printf("iteration for size 2 = %d\n", i);
+        // printf("iteration for size 2 = %d\n", i);
         process_opcode(opcode_arr);
+	continue;
       } else {
-        printf("you are out of bounds stupid\n");
+     //   printf("you are out of bounds stupid\n");
         printf("program terminating\n");
         exit(-1);
       }
-    } else if (i_size == 3 && i + 2 < chunk_size) {
+    } else if (i_size == 3) {
+
+    //printf("process_opcode for size 3\n");
+      // printf("THIS SHOULD PRINT FOR I_SIZE == 3");
       opcode_arr[0] = chunk[i];
       opcode_arr[1] = chunk[i + 1];
       opcode_arr[2] = chunk[i + 2];
       i += 2;
-      printf("iteration for size 2 = %d\n", i);
+      // printf("iteration for size 2 = %d\n", i);
       process_opcode(opcode_arr);
+      continue;
     }
   }
 }
@@ -1065,11 +1098,10 @@ void processFileChunks(FILE *fp, unsigned char *buffer) {
   unsigned char lookahead_buffer[3];
   uint8_t lookahead_bytes_needed = 0;
   size_t bytesread;
-  bool ignore_third_byte = false;
+  unsigned int lookahead_size = 0;
   // bytes read into buffer, loops for the whole file
   while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) > 0) {
-    disAndWrite(buffer, bytesread, lookahead_buffer, &lookahead_bytes_needed,
-                &ignore_third_byte);
+    disAndWrite(buffer, bytesread, lookahead_buffer, &lookahead_bytes_needed, &lookahead_size);
   }
 
   if (ferror(fp)) {
