@@ -28,16 +28,15 @@ char *read_user_input(void) {
   size_t linecap = 0;
   ssize_t linelength;
   linelength = getline(&line_buffer, &linecap, stdin);
-  if (linelength == -1) {
-    printf("Failed to read line");
+  if (linelength <= 0) {
     free(line_buffer);
+    printf("Error with reading line\n");
     return NULL;
-  } else if (linelength > 0 && line_buffer[linelength - 1] == '\n') {
-    line_buffer[linelength - 1] = '\0';
-    return line_buffer;
   }
-  free(line_buffer);
-  return NULL;
+  if (line_buffer[linelength - 1] == '\n') {
+    line_buffer[linelength - 1] = '\0';
+  }
+  return line_buffer;
 }
 
 void disassemble_file(FILE *fp, unsigned char *buffer) {
@@ -52,8 +51,7 @@ void disassemble_file(FILE *fp, unsigned char *buffer) {
     exit(1);
   }
 }
- 
- 
+
 bool out_of_bounds(int i, int chunk_size) { return i >= chunk_size; }
 
 bool is_incomplete_instruction(unsigned char *chunk, int chunk_size, int i) {
@@ -72,7 +70,7 @@ bool is_incomplete_instruction(unsigned char *chunk, int chunk_size, int i) {
 
   return false;
 }
- 
+
 void process_instructions_in_chunk(unsigned char *chunk, int chunk_size,
                                    LookaheadInfo *lookahead_info) {
   unsigned char opcode_arr[3];
@@ -113,7 +111,6 @@ void process_instructions_in_chunk(unsigned char *chunk, int chunk_size,
     }
   }
 }
-
 
 void fill_lookahead_buffer(unsigned char *chunk, int chunk_size,
                            LookaheadInfo *lookahead_info, int i) {
