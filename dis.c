@@ -1,10 +1,26 @@
 #include "dis.h"
 
-typedef struct LookaheadInfo {
-  unsigned char buffer[3];
-  uint8_t bytes_needed;
-  unsigned int size;
-} LookaheadInfo;
+int main(void) {
+  char *filename = read_user_input();
+  if (filename == NULL) {
+    free(filename);
+    printf("Error with reading input, exiting\n");
+    exit(-1);
+  }
+  FILE *fp = fopen(filename, "rb");
+
+  if (fp == NULL) {
+    printf("Could not open file, terminating program\n");
+    free(filename);
+    return -1;
+  }
+
+  unsigned char buffer[CHUNK_SIZE];
+  disassemble_file(fp, buffer);
+  free(filename);
+
+  return 0;
+}
 
 char *read_user_input(void) {
   printf("Enter your filename, (it has to be in this directory)\n");
@@ -24,13 +40,199 @@ char *read_user_input(void) {
   return NULL;
 }
 
-void process_opcode(unsigned char *buffer) { // unfinished
-  // below for debugging:
-  //
-  for (size_t x = 0; x < 3; x++) {
-    // printf("%02x", buffer[x]);
+void disassemble_file(FILE *fp, unsigned char *buffer) {
+  LookaheadInfo lookahead_info = {.bytes_needed = 0, .size = 0};
+  int bytesread;
+  while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) > 0) {
+    process_instructions_in_chunk(buffer, bytesread, &lookahead_info);
   }
-  // printf("\n");
+
+  if (ferror(fp)) {
+    printf("error reading the file\n");
+    exit(1);
+  }
+}
+ 
+ 
+bool out_of_bounds(int i, int chunk_size) { return i >= chunk_size; }
+
+bool is_incomplete_instruction(unsigned char *chunk, int chunk_size, int i) {
+
+  if (i == (chunk_size - 2) && instructionSize(chunk[i]) == 3) {
+    return true;
+  }
+
+  if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 2) {
+    return true;
+  }
+
+  if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 3) {
+    return true;
+  }
+
+  return false;
+}
+ 
+void process_instructions_in_chunk(unsigned char *chunk, int chunk_size,
+                                   LookaheadInfo *lookahead_info) {
+  unsigned char opcode_arr[3];
+
+  for (int i = 0; i < chunk_size; i++) {
+
+    if (i == 0 && (lookahead_info->bytes_needed) > 0) {
+      process_lookahead_buffer(chunk, chunk_size, lookahead_info, &i);
+      continue;
+    }
+
+    if (is_incomplete_instruction(chunk, chunk_size, i)) {
+      fill_lookahead_buffer(chunk, chunk_size, lookahead_info, i);
+      return;
+    }
+
+    uint8_t i_size = instructionSize(chunk[i]);
+
+    if (i_size == 1) {
+      process_opcode(&chunk[i]);
+      continue;
+    } else if (i_size == 2 && !out_of_bounds(i + 1, chunk_size)) {
+      opcode_arr[0] = chunk[i];
+      opcode_arr[1] = chunk[i + 1];
+      i++;
+      process_opcode(opcode_arr);
+      continue;
+    } else if (i_size == 3) {
+      opcode_arr[0] = chunk[i];
+      opcode_arr[1] = chunk[i + 1];
+      opcode_arr[2] = chunk[i + 2];
+      i += 2;
+      process_opcode(opcode_arr);
+      continue;
+    } else {
+      printf("program terminating, problem reading opcode\n");
+      exit(-1);
+    }
+  }
+}
+
+
+void fill_lookahead_buffer(unsigned char *chunk, int chunk_size,
+                           LookaheadInfo *lookahead_info, int i) {
+  if (i == (chunk_size - 2) && instructionSize(chunk[i]) == 3) {
+    if (!out_of_bounds(i + 1, chunk_size)) {
+      lookahead_info->buffer[0] = chunk[i];
+      lookahead_info->buffer[1] = chunk[i + 1];
+      lookahead_info->bytes_needed = 1;
+      lookahead_info->size = 2;
+      return;
+    } else {
+      printf("you are out of bounds stupid\n");
+      printf("program terminating\n");
+      exit(-1);
+    }
+  }
+
+  if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 2) {
+    lookahead_info->buffer[0] = chunk[i];
+    lookahead_info->bytes_needed = 1;
+    lookahead_info->size = 1;
+    return;
+  }
+
+  if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 3) {
+    lookahead_info->buffer[0] = chunk[i];
+    lookahead_info->bytes_needed = 2;
+    lookahead_info->size = 1;
+    return;
+  }
+}
+
+void process_lookahead_buffer(unsigned char *chunk, int chunk_size,
+                              LookaheadInfo *lookahead_info, int *i) {
+
+  unsigned char opcode_arr[3];
+  if (lookahead_info->bytes_needed == 1 && lookahead_info->size == 2) {
+    opcode_arr[0] = lookahead_info->buffer[0];
+    opcode_arr[1] = lookahead_info->buffer[1];
+    opcode_arr[2] = chunk[*i];
+  }
+
+  else if (lookahead_info->bytes_needed == 1 && lookahead_info->size == 1) {
+    opcode_arr[0] = lookahead_info->buffer[0];
+    opcode_arr[1] = chunk[*i];
+  }
+
+  else if (lookahead_info->bytes_needed == 2 && lookahead_info->size == 1) {
+    opcode_arr[0] = lookahead_info->buffer[0];
+    opcode_arr[1] = chunk[*i];
+    if (!out_of_bounds(((*i) + 1), chunk_size) == true) {
+      opcode_arr[2] = chunk[(*i) + 1];
+      (*i)++;
+    } else {
+      printf("Out of bounds on lookahead_bytes_needed = 2 and lookahead size = "
+             "1\n");
+      printf("Failure, exiting program\n");
+      exit(-1);
+    }
+  }
+  lookahead_info->bytes_needed = 0;
+  process_opcode(opcode_arr);
+  return;
+}
+
+uint8_t instructionSize(uint8_t opcode) {
+  switch (opcode) {
+  case 0x01:
+  case 0x11:
+  case 0x21:
+  case 0x22:
+  case 0x2a:
+  case 0x31:
+  case 0x32:
+  case 0x3a:
+  case 0xc2:
+  case 0xc3:
+  case 0xc4:
+  case 0xca:
+  case 0xcc:
+  case 0xcd:
+  case 0xd2:
+  case 0xd4:
+  case 0xda:
+  case 0xdc:
+  case 0xe2:
+  case 0xe4:
+  case 0xea:
+  case 0xec:
+  case 0xf2:
+  case 0xf4:
+  case 0xfa:
+  case 0xfc:
+    return 3;
+  case 0x06:
+  case 0x0e:
+  case 0x16:
+  case 0x1e:
+  case 0x26:
+  case 0x2e:
+  case 0x36:
+  case 0x3e:
+  case 0xc6:
+  case 0xce:
+  case 0xd3:
+  case 0xd6:
+  case 0xdb:
+  case 0xde:
+  case 0xe6:
+  case 0xee:
+  case 0xf6:
+  case 0xfe:
+    return 2;
+  default:
+    return 1;
+  }
+}
+
+void process_opcode(unsigned char *buffer) {
   switch (buffer[0]) {
   case 0x00:
   case 0x08:
@@ -706,11 +908,6 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
 
   case 0xC6:
-    // printf("FIND ME\n");
-    // for (size_t x = 0; x < 3; x++) {
-    //  printf("%02x", buffer[x]);
-    //}
-    // printf("\n");
     printf("ADI	#$%02x\n", buffer[1]);
     break;
   case 0xD6:
@@ -833,278 +1030,4 @@ void process_opcode(unsigned char *buffer) { // unfinished
     break;
   }
   return;
-}
-
-uint8_t instructionSize(uint8_t opcode) { // unfinished
-
-  // printf("instru size = %02x\n", opcode);
-  switch (opcode) {
-  case 0x01:
-  case 0x11:
-  case 0x21:
-  case 0x22:
-  case 0x2a:
-  case 0x31:
-  case 0x32:
-  case 0x3a:
-  case 0xc2:
-  case 0xc3:
-  case 0xc4:
-  case 0xca:
-  case 0xcc:
-  case 0xcd:
-  case 0xd2:
-  case 0xd4:
-  case 0xda:
-  case 0xdc:
-  case 0xe2:
-  case 0xe4:
-  case 0xea:
-  case 0xec:
-  case 0xf2:
-  case 0xf4:
-  case 0xfa:
-  case 0xfc:
-    return 3;
-  case 0x06:
-  case 0x0e:
-  case 0x16:
-  case 0x1e:
-  case 0x26:
-  case 0x2e:
-  case 0x36:
-  case 0x3e:
-  case 0xc6:
-  case 0xce:
-  case 0xd3:
-  case 0xd6:
-  case 0xdb:
-  case 0xde:
-  case 0xe6:
-  case 0xee:
-  case 0xf6:
-  case 0xfe:
-    return 2;
-  default:
-    return 1;
-  } // todo: check these are correct
-}
-
-
-bool out_of_bounds(size_t i, int chunk_size) {
-  return i >= chunk_size; // if i == chunk_size or bigger (then true)
-                          // otherwise return false
-}
-
-// TODO: deal with final iterations bound checking etc
-void process_lookahead_buffer(unsigned char *chunk, size_t chunk_size,
-                              LookaheadInfo *lookahead_info, size_t *i ) {
-
-  unsigned char opcode_arr[3];
-  if (lookahead_info->bytes_needed == 1 &&
-      lookahead_info->size == 2) { // TODO: boundary check redudant here
-                                   // as I believe I should never be out
-                                   // of bounds in the loop, we aren't
-                                   // incrementing here.
-    opcode_arr[0] = lookahead_info->buffer[0];
-    opcode_arr[1] = lookahead_info->buffer[1];
-    opcode_arr[2] = chunk[*i];
-  }
-
-  else if (lookahead_info->bytes_needed == 1 && lookahead_info->size == 1) {
-    opcode_arr[0] = lookahead_info->buffer[0];
-    opcode_arr[1] = chunk[*i];
-  }
-
-  else if (lookahead_info->bytes_needed == 2 && lookahead_info->size == 1) {
-    opcode_arr[0] = lookahead_info->buffer[0];
-    opcode_arr[1] = chunk[*i];
-    if (!out_of_bounds(((*i) + 1), chunk_size) == true) {
-      opcode_arr[2] = chunk[(*i) + 1];
-      (*i)++;
-    } else {
-      printf("Out of bounds on lookahead_bytes_needed = 2 and lookahead size = "
-             "1\n");
-      printf("Failure, exiting program\n");
-      exit(-1);
-    }
-  }
-
-  lookahead_info->bytes_needed = 0;
-  process_opcode(opcode_arr);
-  return;
-}
-
-void fill_lookahead_buffer(unsigned char *chunk, size_t chunk_size,
-                           LookaheadInfo *lookahead_info, int i) {
-  if (i == (chunk_size - 2) && instructionSize(chunk[i]) == 3) {
-    if (!out_of_bounds(i + 1, chunk_size)) {
-      lookahead_info->buffer[0] = chunk[i];
-      lookahead_info->buffer[1] = chunk[i + 1];
-      lookahead_info->bytes_needed = 1;
-      lookahead_info->size = 2;
-      return;
-    } else {
-      printf("you are out of bounds stupid\n");
-      printf("program terminating\n");
-      exit(-1);
-    }
-  }
-
-  if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 2) {
-    //      printf("ACTIVATING buffer on iteration: %d, number of instruction
-    //      is 2!lol\n", i); printf("CHUNK[I] = %02x\n", chunk[i]);
-    lookahead_info->buffer[0] = chunk[i];
-    lookahead_info->bytes_needed = 1;
-    lookahead_info->size = 1;
-    return;
-  }
-
-  // TODO: I think the whole ignore third byte is redudtant as the processing
-  // done by processopcode ignored the 3rd byte if its not required? but im
-  // not sure since it might filled and burn another iteration which would
-  // lead to issues
-  if ((i) == (chunk_size - 1) && instructionSize(chunk[i]) == 3) {
-    //      printf("chunk_size - 1 and instruction size 3");
-    //      printf("ACTIVATING buffer on iteration: %d, number of
-    //      instructionis 3!\n", i);
-    lookahead_info->buffer[0] = chunk[i];
-    lookahead_info->bytes_needed = 2;
-    lookahead_info->size = 1;
-    return;
-  }
-  // the above should cover the 3 lookahead cases
-  // 2nd last requiring 3 bytes
-  // last requiring 2 bytes or 3 bytes
-}
-
-bool is_lookahead_condition(unsigned char *chunk, size_t chunk_size, int i) {
-
-  if (i == (chunk_size - 2) && instructionSize(chunk[i]) == 3) {
-    return true;
-  }
-
-  if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 2) {
-    return true;
-  }
-
-  if (i == (chunk_size - 1) && instructionSize(chunk[i]) == 3) {
-    return true;
-  }
-
-  return false;
-}
-
-void dis(unsigned char *chunk, size_t chunk_size,
-         LookaheadInfo *lookahead_info) {
-  unsigned char opcode_arr[3];
-
-  for (size_t i = 0; i < chunk_size; i++) {
-    size_t iteration_value = i;
-    unsigned char chunk_value = chunk[i];
-    // debug   printf("iteration: %d\n", i);
-    // debug   printf("byte: %02x\n", chunk[i]);
-    // debug   printf("lookahead bytes needed: %d\n", *lookahead_bytes_needed);
-
-    if (i == 0 && (lookahead_info->bytes_needed) > 0) {
-      // printf("THIS SHOULD NOT PRINT");
-      process_lookahead_buffer(chunk, chunk_size, lookahead_info, &i);
-      //       printf("lookahead processed\n");
-      continue;
-    }
-
-    // would be the 2nd final iteration:
-    // if the instruction requires 3 bytes, then take this and next
-    // and then require 1 more byte? i think
-    // then return
-    if (is_lookahead_condition(chunk, chunk_size, i)) {
-      fill_lookahead_buffer(chunk, chunk_size, lookahead_info, i);
-      // TODO: come back to this
-      return;
-    }
-
-    uint8_t i_size = instructionSize(chunk[i]);
-    //   printf("Instruction size: %d\n", i_size);
-
-    // printf("i = %d\n", i);
-    // TODO: pretty sure I handle the boundaries for the end of the chunk
-    // buffer, so don't need to handle below, but check
-    if (i_size == 1) {
-      //	printf("process_opcode for size 1\n");
-      process_opcode(&chunk[i]);
-      continue;
-    } else if (i_size == 2) {
-      //  printf("process_opcode for size 2\n");
-      if (!out_of_bounds(i + 1, chunk_size)) { // redudant
-        // printf("THIS SHOULD PRINT FOR I_SIZE == 2");
-        opcode_arr[0] = chunk[i];
-        // printf("opcode_arr[0]: %02x", opcode_arr[0]);
-        opcode_arr[1] = chunk[i + 1];
-
-        // printf("opcode_arr[1]: %02x", opcode_arr[1]);
-        i++;
-        // suspect this might out of bounds and mess up next chunk so debugging
-        // printf("iteration for size 2 = %d\n", i);
-        process_opcode(opcode_arr);
-        continue;
-      } else {
-        //   printf("you are out of bounds stupid\n");
-        printf("program terminating\n");
-        exit(-1);
-      }
-    } else if (i_size == 3) {
-
-      // printf("process_opcode for size 3\n");
-      //  printf("THIS SHOULD PRINT FOR I_SIZE == 3");
-      opcode_arr[0] = chunk[i];
-      opcode_arr[1] = chunk[i + 1];
-      opcode_arr[2] = chunk[i + 2];
-      i += 2;
-      // printf("iteration for size 2 = %d\n", i);
-      process_opcode(opcode_arr);
-      continue;
-    }
-  }
-}
-
-// process the buffer (this should be the chunk of
-// data we read)
-// the bytes read here, will mean if the chunk_size is
-// smaller then its fine
-void processFileChunks(FILE *fp, unsigned char *buffer) {
-
-  LookaheadInfo lookahead_info = {.bytes_needed = 0, .size = 0};
-
-  size_t bytesread;
-  // bytes read into buffer, loops for the whole file
-  while ((bytesread = fread(buffer, 1, CHUNK_SIZE, fp)) > 0) {
-    dis(buffer, bytesread, &lookahead_info);
-  }
-
-  if (ferror(fp)) {
-    printf("error reading the file\n");
-    exit(1);
-  }
-}
-
-int main(void) {
-
-  char *filename = read_user_input();
-  if (filename == NULL) {
-    free(filename);
-    return -1;
-  }
-  FILE *fp = fopen(filename, "rb");
-
-  if (fp == NULL) {
-    printf("Could not open file, terminating program\n");
-    free(filename);
-    return -1;
-  }
-
-  unsigned char buffer[CHUNK_SIZE];
-  processFileChunks(fp, buffer);
-  free(filename);
-
-  return 0;
 }
